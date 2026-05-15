@@ -999,27 +999,37 @@ class TimeBlockCard extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 18),
-          ReorderableListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            buildDefaultDragHandles: false,
-            proxyDecorator: _proxyDecorator,
-            itemCount: blocks.length,
-            onReorder: planner.reorderTimeBlocks,
-            itemBuilder: (context, index) {
-              final block = blocks[index];
-              return TimeBlockRow(
-                key: ValueKey('time-${block.id}'),
-                index: index,
-                block: block,
-              );
-            },
-          ),
-          const SizedBox(height: 2),
-          _FullWidthButton(
-            icon: Icons.add_rounded,
-            label: '새로운 시간 블록 추가',
-            onPressed: planner.addTimeBlock,
+          AnimatedSize(
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ReorderableListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  buildDefaultDragHandles: false,
+                  proxyDecorator: _proxyDecorator,
+                  itemCount: blocks.length,
+                  onReorder: planner.reorderTimeBlocks,
+                  itemBuilder: (context, index) {
+                    final block = blocks[index];
+                    return TimeBlockRow(
+                      key: ValueKey('time-${block.id}'),
+                      index: index,
+                      block: block,
+                    );
+                  },
+                ),
+                const SizedBox(height: 2),
+                _FullWidthButton(
+                  icon: Icons.add_rounded,
+                  label: '새로운 시간 블록 추가',
+                  onPressed: planner.addTimeBlock,
+                ),
+              ],
+            ),
           ),
         ],
       ),
