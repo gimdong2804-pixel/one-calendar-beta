@@ -586,74 +586,150 @@ class PriorityPanel extends StatelessWidget {
   }
 }
 
-class PriorityRow extends StatelessWidget {
+/// 레거시 웹앱의 springPop / popOut 커브 상수
+const _springPopCurve = Cubic(0.175, 0.885, 0.32, 1.275);
+const _popOutCurve = Cubic(0.55, 0.085, 0.68, 0.53);
+const _springPopDuration = Duration(milliseconds: 400);
+const _popOutDuration = Duration(milliseconds: 350);
+
+class PriorityRow extends StatefulWidget {
   const PriorityRow({super.key, required this.index, required this.value});
 
   final int index;
   final String value;
 
   @override
+  State<PriorityRow> createState() => _PriorityRowState();
+}
+
+class _PriorityRowState extends State<PriorityRow>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnim;
+  late final Animation<double> _opacityAnim;
+  late final Animation<Offset> _slideAnim;
+  bool _isExiting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: _springPopDuration,
+    );
+    _scaleAnim = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: _springPopCurve),
+    );
+    _opacityAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: _springPopCurve),
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _animateOut(VoidCallback onComplete) {
+    if (_isExiting) return;
+    setState(() => _isExiting = true);
+    _controller.duration = _popOutDuration;
+    _controller.reverse().then((_) {
+      if (mounted) onComplete();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = context.read<PlannerProvider>();
     final isCompact = MediaQuery.sizeOf(context).width < 620;
-    if (isCompact) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 18),
-        child: _PriorityMobileCard(
-          index: index,
-          value: value,
-          onChanged: (next) => provider.updatePriority(index, next),
-          onDelete: () => provider.removePriority(index),
-        ),
-      );
-    }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: _InputPill(
-        child: Row(
-          children: [
-            ReorderableDragStartListener(
-              index: index,
-              child: Icon(
-                Icons.drag_indicator_rounded,
-                color: context.mutedText,
-              ),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return SlideTransition(
+          position: _slideAnim,
+          child: FadeTransition(
+            opacity: _opacityAnim,
+            child: ScaleTransition(
+              scale: _scaleAnim,
+              child: child,
             ),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: 32,
-              child: GradientText(
-                '${index + 1}',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
+          ),
+        );
+      },
+      child: isCompact
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 18),
+              child: _PriorityMobileCard(
+                index: widget.index,
+                value: widget.value,
+                onChanged: (next) =>
+                    provider.updatePriority(widget.index, next),
+                onDelete: () => _animateOut(
+                  () => provider.removePriority(widget.index),
+                ),
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: _InputPill(
+                child: Row(
+                  children: [
+                    ReorderableDragStartListener(
+                      index: widget.index,
+                      child: Icon(
+                        Icons.drag_indicator_rounded,
+                        color: context.mutedText,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 32,
+                      child: GradientText(
+                        '${widget.index + 1}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: widget.value,
+                        minLines: 1,
+                        maxLines: 3,
+                        textInputAction: TextInputAction.newline,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                        decoration: const InputDecoration(
+                          hintText: '반드시 해결해야 할 최우선 과제 (Top 3)',
+                        ),
+                        onChanged: (next) =>
+                            provider.updatePriority(widget.index, next),
+                      ),
+                    ),
+                    _InlineDeleteButton(
+                      onPressed: () => _animateOut(
+                        () => provider.removePriority(widget.index),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextFormField(
-                initialValue: value,
-                minLines: 1,
-                maxLines: 3,
-                textInputAction: TextInputAction.newline,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
-                decoration: const InputDecoration(
-                  hintText: '반드시 해결해야 할 최우선 과제 (Top 3)',
-                ),
-                onChanged: (next) => provider.updatePriority(index, next),
-              ),
-            ),
-            _InlineDeleteButton(
-              onPressed: () => provider.removePriority(index),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -952,11 +1028,60 @@ class TimeBlockCard extends StatelessWidget {
   }
 }
 
-class TimeBlockRow extends StatelessWidget {
+class TimeBlockRow extends StatefulWidget {
   const TimeBlockRow({super.key, required this.index, required this.block});
 
   final int index;
   final TimeBlock block;
+
+  @override
+  State<TimeBlockRow> createState() => _TimeBlockRowState();
+}
+
+class _TimeBlockRowState extends State<TimeBlockRow>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnim;
+  late final Animation<double> _opacityAnim;
+  late final Animation<Offset> _slideAnim;
+  bool _isExiting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: _springPopDuration,
+    );
+    _scaleAnim = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: _springPopCurve),
+    );
+    _opacityAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: _springPopCurve),
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _animateOut(VoidCallback onComplete) {
+    if (_isExiting) return;
+    setState(() => _isExiting = true);
+    _controller.duration = _popOutDuration;
+    _controller.reverse().then((_) {
+      if (mounted) onComplete();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -966,87 +1091,113 @@ class TimeBlockRow extends StatelessWidget {
     final timeField = SizedBox(
       width: compact ? null : 164,
       child: TextFormField(
-        initialValue: block.time,
+        initialValue: widget.block.time,
         textAlign: compact ? TextAlign.left : TextAlign.center,
         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
           color: Theme.of(context).textTheme.bodyMedium?.color,
           fontWeight: FontWeight.w800,
         ),
         decoration: const InputDecoration(hintText: 'e.g. 07:30-08:00'),
-        onChanged: (value) => provider.updateTimeBlock(index, time: value),
+        onChanged: (value) =>
+            provider.updateTimeBlock(widget.index, time: value),
       ),
     );
 
     final textField = Expanded(
       child: TextFormField(
-        initialValue: block.text,
+        initialValue: widget.block.text,
         minLines: 1,
         maxLines: 4,
-        style: Theme.of(
-          context,
-        ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
-        decoration: const InputDecoration(hintText: '해당 시간에 무엇을 할 계획인가요?'),
-        onChanged: (value) => provider.updateTimeBlock(index, text: value),
+        style: Theme.of(context)
+            .textTheme
+            .bodyLarge
+            ?.copyWith(fontWeight: FontWeight.w700),
+        decoration:
+            const InputDecoration(hintText: '해당 시간에 무엇을 할 계획인가요?'),
+        onChanged: (value) =>
+            provider.updateTimeBlock(widget.index, text: value),
       ),
     );
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: _InputPill(
-        child: compact
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      ReorderableDragStartListener(
-                        index: index,
-                        child: Icon(
-                          Icons.drag_indicator_rounded,
-                          color: context.mutedText,
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return SlideTransition(
+          position: _slideAnim,
+          child: FadeTransition(
+            opacity: _opacityAnim,
+            child: ScaleTransition(
+              scale: _scaleAnim,
+              child: child,
+            ),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: _InputPill(
+          child: compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        ReorderableDragStartListener(
+                          index: widget.index,
+                          child: Icon(
+                            Icons.drag_indicator_rounded,
+                            color: context.mutedText,
+                          ),
                         ),
+                        const SizedBox(width: 8),
+                        Expanded(child: timeField),
+                        _InlineDeleteButton(
+                          onPressed: () => _animateOut(
+                            () => provider.removeTimeBlock(widget.index),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      initialValue: widget.block.text,
+                      minLines: 1,
+                      maxLines: 4,
+                      style:
+                          Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(child: timeField),
-                      _InlineDeleteButton(
-                        onPressed: () => provider.removeTimeBlock(index),
+                      decoration: const InputDecoration(
+                        hintText: '해당 시간에 무엇을 할 계획인가요?',
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    initialValue: block.text,
-                    minLines: 1,
-                    maxLines: 4,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
+                      onChanged: (value) => provider.updateTimeBlock(
+                        widget.index,
+                        text: value,
+                      ),
                     ),
-                    decoration: const InputDecoration(
-                      hintText: '해당 시간에 무엇을 할 계획인가요?',
+                  ],
+                )
+              : Row(
+                  children: [
+                    ReorderableDragStartListener(
+                      index: widget.index,
+                      child: Icon(
+                        Icons.drag_indicator_rounded,
+                        color: context.mutedText,
+                      ),
                     ),
-                    onChanged: (value) =>
-                        provider.updateTimeBlock(index, text: value),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  ReorderableDragStartListener(
-                    index: index,
-                    child: Icon(
-                      Icons.drag_indicator_rounded,
-                      color: context.mutedText,
+                    const SizedBox(width: 8),
+                    timeField,
+                    const SizedBox(width: 18),
+                    textField,
+                    _InlineDeleteButton(
+                      onPressed: () => _animateOut(
+                        () => provider.removeTimeBlock(widget.index),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  timeField,
-                  const SizedBox(width: 18),
-                  textField,
-                  _InlineDeleteButton(
-                    onPressed: () => provider.removeTimeBlock(index),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+        ),
       ),
     );
   }
