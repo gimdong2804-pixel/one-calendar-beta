@@ -373,12 +373,13 @@ class _FloatingControls extends StatelessWidget {
           ),
           tooltip: '테마 변경',
           compact: isCompact,
+          breatheDelay: const Duration(milliseconds: 800),
           onPressed: () {
             final next = isDark ? ThemeMode.light : ThemeMode.dark;
             unawaited(settings.setThemeMode(next));
           },
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: isCompact ? 10 : 14),
         _FloatingIconButton(
           glyph: settings.isSoundEnabled
               ? _SoundGlyph(size: isCompact ? 24 : 28)
@@ -388,10 +389,11 @@ class _FloatingControls extends StatelessWidget {
                 ),
           tooltip: '터치음 켜기/끄기',
           compact: isCompact,
+          breatheDelay: const Duration(milliseconds: 1500),
           onPressed: () =>
               unawaited(settings.setSoundEnabled(!settings.isSoundEnabled)),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: isCompact ? 10 : 14),
         _FloatingIconButton(
           glyph: _GradientGlyph(
             size: isCompact ? 24 : 28,
@@ -399,6 +401,7 @@ class _FloatingControls extends StatelessWidget {
           ),
           tooltip: '환경 설정',
           compact: isCompact,
+          breatheDelay: Duration.zero,
           onPressed: () => showSettingsModal(context),
         ),
       ],
@@ -1758,36 +1761,139 @@ class _PomodoroCheck extends StatelessWidget {
   }
 }
 
-class _FloatingIconButton extends StatelessWidget {
+class _FloatingIconButton extends StatefulWidget {
   const _FloatingIconButton({
     required this.glyph,
     required this.tooltip,
     required this.compact,
     required this.onPressed,
+    this.breatheDelay = Duration.zero,
   });
 
   final Widget glyph;
   final String tooltip;
   final bool compact;
   final VoidCallback onPressed;
+  final Duration breatheDelay;
+
+  @override
+  State<_FloatingIconButton> createState() => _FloatingIconButtonState();
+}
+
+class _FloatingIconButtonState extends State<_FloatingIconButton>
+    with TickerProviderStateMixin {
+  late final AnimationController _breatheController;
+  late final Animation<double> _breatheAnim;
+  AnimationController? _bounceController;
+  Animation<double>? _bounceAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    // Breathing animation: 3s infinite, scale 1.0 <-> 1.03
+    _breatheController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3000),
+    );
+    _breatheAnim = Tween<double>(begin: 1.0, end: 1.03).animate(
+      CurvedAnimation(parent: _breatheController, curve: Curves.easeInOut),
+    );
+    // Start with delay for staggered effect
+    Future.delayed(widget.breatheDelay, () {
+      if (mounted) _breatheController.repeat(reverse: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _breatheController.dispose();
+    _bounceController?.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    // Bounce animation on tap: scale 1 -> 0.85 -> 1.15 -> 0.95 -> 1
+    _bounceController?.dispose();
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _bounceAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.85), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 0.85, end: 1.15), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 1.15, end: 0.95), weight: 20),
+      TweenSequenceItem(tween: Tween(begin: 0.95, end: 1.0), weight: 20),
+    ]).animate(
+      CurvedAnimation(
+        parent: _bounceController!,
+        curve: const Cubic(0.34, 1.56, 0.64, 1),
+      ),
+    );
+    _bounceController!.forward(from: 0);
+    widget.onPressed();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final size = compact ? 38.0 : 48.0;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Match old web app: 52x52 on desktop, slightly smaller on compact
+    final size = widget.compact ? 44.0 : 52.0;
+
+    // Glass background colors matching old CSS variables
+    final bgColor = isDark
+        ? const Color(0xFF1E293B).withValues(alpha: 0.65)
+        : Colors.white.withValues(alpha: 0.6);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.15)
+        : Colors.white;
+    final shadowColor = isDark
+        ? Colors.black.withValues(alpha: 0.4)
+        : Colors.black.withValues(alpha: 0.05);
+
     return Tooltip(
-      message: tooltip,
-      child: DecoratedBox(
-        decoration: _floatingDecoration(context, borderRadius: 999),
-        child: Material(
-          color: Colors.transparent,
-          shape: const CircleBorder(),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: onPressed,
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: Center(child: glyph),
+      message: widget.tooltip,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([
+          _breatheController,
+          _bounceController,
+        ].nonNulls.toList()),
+        builder: (context, child) {
+          final breatheScale = _breatheAnim.value;
+          final bounceScale = _bounceAnim?.value ?? 1.0;
+          // Pause breathing during bounce
+          final scale = (_bounceController?.isAnimating ?? false)
+              ? bounceScale
+              : breatheScale;
+
+          return Transform.scale(
+            scale: scale,
+            child: child,
+          );
+        },
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: bgColor,
+            shape: BoxShape.circle,
+            border: Border.all(color: borderColor, width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: shadowColor,
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: _handleTap,
+              child: SizedBox(
+                width: size,
+                height: size,
+                child: Center(child: widget.glyph),
+              ),
             ),
           ),
         ),
