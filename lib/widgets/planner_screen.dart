@@ -588,7 +588,6 @@ class PriorityPanel extends StatelessWidget {
 
 /// 레거시 웹앱의 springPop / popOut 커브 상수
 const _springPopCurve = Cubic(0.175, 0.885, 0.32, 1.275);
-const _popOutCurve = Cubic(0.55, 0.085, 0.68, 0.53);
 const _springPopDuration = Duration(milliseconds: 400);
 const _popOutDuration = Duration(milliseconds: 350);
 
