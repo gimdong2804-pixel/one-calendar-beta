@@ -44,6 +44,16 @@ class OneCalendarApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
+      builder: (context, child) {
+        final scale = MediaQuery.textScalerOf(context).scale(1);
+        final clamped = scale > 1.08 ? 1.08 : scale;
+        return MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(clamped)),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       home: const PlannerScreen(),
       debugShowCheckedModeBanner: false,
     );

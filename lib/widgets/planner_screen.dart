@@ -20,6 +20,7 @@ class PlannerScreen extends StatelessWidget {
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 780;
         final planner = context.watch<PlannerProvider>();
+        final topInset = MediaQuery.paddingOf(context).top;
 
         return Scaffold(
           body: Stack(
@@ -30,7 +31,7 @@ class PlannerScreen extends StatelessWidget {
                   child: SingleChildScrollView(
                     padding: EdgeInsets.fromLTRB(
                       isCompact ? 14 : 20,
-                      isCompact ? 92 : 40,
+                      isCompact ? topInset + 104 : 40,
                       isCompact ? 14 : 20,
                       158,
                     ),
@@ -56,9 +57,13 @@ class PlannerScreen extends StatelessWidget {
                 ),
               ),
               if (isCompact)
-                const Positioned(top: 12, left: 12, child: _MobileDateDock()),
+                Positioned(
+                  top: topInset + 12,
+                  left: 12,
+                  child: const _MobileDateDock(),
+                ),
               Positioned(
-                top: isCompact ? 12 : 20,
+                top: isCompact ? topInset + 12 : 20,
                 right: isCompact ? 18 : 24,
                 child: _FloatingControls(isCompact: isCompact),
               ),
@@ -192,55 +197,158 @@ class _MobileDateDock extends StatelessWidget {
 
     return DecoratedBox(
       decoration: _floatingDecoration(context, borderRadius: 999),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _MiniCircleButton(
-              icon: Icons.chevron_left,
-              tooltip: '이전 날짜',
-              onPressed: () => unawaited(planner.changeDate(-1)),
-            ),
-            InkWell(
-              borderRadius: BorderRadius.circular(18),
-              onTap: () => _pickDate(context),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      weekday,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        color: context.mutedText,
-                      ),
+      child: SizedBox(
+        width: 168,
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: Row(
+            children: [
+              _MiniCircleButton(
+                icon: Icons.chevron_left,
+                tooltip: '이전 날짜',
+                onPressed: () => unawaited(planner.changeDate(-1)),
+              ),
+              Expanded(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  onTap: () => _pickDate(context),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          weekday,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: context.mutedText,
+                              ),
+                        ),
+                        GradientText(
+                          displayDate,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            height: 1.08,
+                          ),
+                        ),
+                      ],
                     ),
-                    GradientText(
-                      displayDate,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        height: 1.08,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-            _MiniCircleButton(
-              icon: Icons.chevron_right,
-              tooltip: '다음 날짜',
-              onPressed: () => unawaited(planner.changeDate(1)),
-            ),
-          ],
+              _MiniCircleButton(
+                icon: Icons.chevron_right,
+                tooltip: '다음 날짜',
+                onPressed: () => unawaited(planner.changeDate(1)),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+}
+
+class _GradientGlyph extends StatelessWidget {
+  const _GradientGlyph({required this.child, this.size = 24});
+
+  final Widget child;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      shaderCallback: (bounds) => LinearGradient(
+        colors: [
+          Theme.of(context).colorScheme.primary,
+          Theme.of(context).colorScheme.secondary,
+        ],
+      ).createShader(bounds),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: IconTheme.merge(
+          data: IconThemeData(size: size, color: Colors.white),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _SoundGlyph extends StatelessWidget {
+  const _SoundGlyph({this.size = 24});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GradientGlyph(
+      size: size,
+      child: CustomPaint(painter: _SoundGlyphPainter()),
+    );
+  }
+}
+
+class _SoundGlyphPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final paint = Paint()
+      ..shader = const LinearGradient(
+        colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+      ).createShader(rect)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.width * 0.11
+      ..strokeCap = StrokeCap.round;
+
+    final bar = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        size.width * 0.18,
+        size.height * 0.28,
+        size.width * 0.2,
+        size.height * 0.48,
+      ),
+      Radius.circular(size.width * 0.12),
+    );
+    canvas.drawRRect(bar, paint);
+    canvas.drawArc(
+      Rect.fromLTWH(
+        size.width * 0.46,
+        size.height * 0.32,
+        size.width * 0.26,
+        size.height * 0.36,
+      ),
+      -math.pi / 3,
+      math.pi * 2 / 3,
+      false,
+      paint,
+    );
+    final outerPaint = Paint()
+      ..shader = paint.shader
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.width * 0.095
+      ..strokeCap = StrokeCap.round;
+    canvas.drawArc(
+      Rect.fromLTWH(
+        size.width * 0.56,
+        size.height * 0.18,
+        size.width * 0.32,
+        size.height * 0.64,
+      ),
+      -math.pi / 3,
+      math.pi * 2 / 3,
+      false,
+      outerPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _FloatingControls extends StatelessWidget {
@@ -257,7 +365,12 @@ class _FloatingControls extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _FloatingIconButton(
-          icon: isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+          glyph: _GradientGlyph(
+            size: isCompact ? 24 : 28,
+            child: Icon(
+              isDark ? Icons.dark_mode_outlined : Icons.wb_sunny_outlined,
+            ),
+          ),
           tooltip: '테마 변경',
           compact: isCompact,
           onPressed: () {
@@ -267,9 +380,12 @@ class _FloatingControls extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         _FloatingIconButton(
-          icon: settings.isSoundEnabled
-              ? Icons.volume_up_rounded
-              : Icons.volume_off_rounded,
+          glyph: settings.isSoundEnabled
+              ? _SoundGlyph(size: isCompact ? 24 : 28)
+              : _GradientGlyph(
+                  size: isCompact ? 24 : 28,
+                  child: const Icon(Icons.volume_off_outlined),
+                ),
           tooltip: '터치음 켜기/끄기',
           compact: isCompact,
           onPressed: () =>
@@ -277,7 +393,10 @@ class _FloatingControls extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         _FloatingIconButton(
-          icon: Icons.settings_rounded,
+          glyph: _GradientGlyph(
+            size: isCompact ? 24 : 28,
+            child: const Icon(Icons.settings_outlined),
+          ),
           tooltip: '환경 설정',
           compact: isCompact,
           onPressed: () => showSettingsModal(context),
@@ -293,6 +412,7 @@ class PrioritiesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final planner = context.watch<PlannerProvider>();
+    final isCompact = MediaQuery.sizeOf(context).width < 620;
     final isTodoPanel = planner.activePanel == PlannerPanel.todos;
     final title = isTodoPanel
         ? '할 일 목록'
@@ -305,35 +425,53 @@ class PrioritiesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
-                  child: Column(
-                    key: ValueKey(title),
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SectionTitle(
-                        icon: isTodoPanel
-                            ? Icons.checklist_rounded
-                            : Icons.local_fire_department_rounded,
-                        title: title,
-                      ),
-                      Text(
-                        subtitle,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
+          if (isCompact)
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 220),
+              child: Column(
+                key: ValueKey('compact-$title'),
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SectionTitle(
+                    emoji: isTodoPanel ? null : '🔥',
+                    icon: isTodoPanel ? Icons.checklist_rounded : null,
+                    title: title,
+                  ),
+                  Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
+                  const SizedBox(height: 28),
+                  _ModeToggleButton(isTodoPanel: isTodoPanel, fullWidth: true),
+                ],
+              ),
+            )
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 220),
+                    child: Column(
+                      key: ValueKey(title),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SectionTitle(
+                          emoji: isTodoPanel ? null : '🔥',
+                          icon: isTodoPanel ? Icons.checklist_rounded : null,
+                          title: title,
+                        ),
+                        Text(
+                          subtitle,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 14),
-              _ModeToggleButton(isTodoPanel: isTodoPanel),
-            ],
-          ),
-          const SizedBox(height: 22),
+                const SizedBox(width: 14),
+                _ModeToggleButton(isTodoPanel: isTodoPanel),
+              ],
+            ),
+          SizedBox(height: isCompact ? 34 : 22),
           AnimatedSize(
             duration: const Duration(milliseconds: 260),
             curve: Curves.easeOutCubic,
@@ -352,50 +490,59 @@ class PrioritiesCard extends StatelessWidget {
 }
 
 class _ModeToggleButton extends StatelessWidget {
-  const _ModeToggleButton({required this.isTodoPanel});
+  const _ModeToggleButton({required this.isTodoPanel, this.fullWidth = false});
 
   final bool isTodoPanel;
+  final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
     final tertiary = Theme.of(context).colorScheme.tertiary;
     final color = isTodoPanel ? tertiary : primary;
-    return Tooltip(
-      message: isTodoPanel ? '핵심 목표로 돌아가기' : '할 일 목록 열기',
-      child: Material(
-        color: color.withValues(alpha: 0.11),
-        shape: StadiumBorder(
-          side: BorderSide(color: color.withValues(alpha: 0.22)),
-        ),
-        child: InkWell(
-          customBorder: const StadiumBorder(),
-          onTap: context.read<PlannerProvider>().togglePriorityTodoPanel,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  isTodoPanel ? '핵심 목표로 돌아가기' : '할 일 목록 열기',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.w800,
-                  ),
+    final button = Material(
+      color: color.withValues(alpha: 0.11),
+      shape: StadiumBorder(
+        side: BorderSide(color: color.withValues(alpha: 0.22)),
+      ),
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        onTap: context.read<PlannerProvider>().togglePriorityTodoPanel,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: fullWidth ? 18 : 16,
+            vertical: fullWidth ? 17 : 13,
+          ),
+          child: Row(
+            mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                isTodoPanel ? '핵심 목표로 돌아가기' : '할 일 목록 열기',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w800,
                 ),
-                const SizedBox(width: 8),
-                Icon(
-                  isTodoPanel
-                      ? Icons.keyboard_return_rounded
-                      : Icons.open_in_new_rounded,
-                  color: color,
-                  size: 18,
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                isTodoPanel
+                    ? Icons.keyboard_return_rounded
+                    : Icons.open_in_new_rounded,
+                color: color,
+                size: 18,
+              ),
+            ],
           ),
         ),
       ),
+    );
+
+    return Tooltip(
+      message: isTodoPanel ? '핵심 목표로 돌아가기' : '할 일 목록 열기',
+      child: fullWidth
+          ? SizedBox(width: double.infinity, child: button)
+          : button,
     );
   }
 }
@@ -448,6 +595,19 @@ class PriorityRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.read<PlannerProvider>();
+    final isCompact = MediaQuery.sizeOf(context).width < 620;
+    if (isCompact) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 18),
+        child: _PriorityMobileCard(
+          index: index,
+          value: value,
+          onChanged: (next) => provider.updatePriority(index, next),
+          onDelete: () => provider.removePriority(index),
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: _InputPill(
@@ -492,6 +652,93 @@ class PriorityRow extends StatelessWidget {
               onPressed: () => provider.removePriority(index),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PriorityMobileCard extends StatelessWidget {
+  const _PriorityMobileCard({
+    required this.index,
+    required this.value,
+    required this.onChanged,
+    required this.onDelete,
+  });
+
+  final int index;
+  final String value;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: context.borderSubtle),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 28,
+            offset: const Offset(0, 16),
+          ),
+        ],
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 176),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  ReorderableDragStartListener(
+                    index: index,
+                    child: Icon(
+                      Icons.drag_indicator_rounded,
+                      color: context.mutedText,
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(width: 18),
+                  SizedBox(
+                    width: 48,
+                    child: GradientText(
+                      '${index + 1}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  _InlineDeleteButton(onPressed: onDelete),
+                ],
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 96,
+                child: TextFormField(
+                  initialValue: value,
+                  expands: true,
+                  minLines: null,
+                  maxLines: null,
+                  textAlignVertical: TextAlignVertical.top,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: '반드시 해결해야 할 최우선 과제',
+                  ),
+                  onChanged: onChanged,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1093,9 +1340,10 @@ class GlassPanel extends StatelessWidget {
 }
 
 class SectionTitle extends StatelessWidget {
-  const SectionTitle({super.key, required this.icon, required this.title});
+  const SectionTitle({super.key, this.icon, this.emoji, required this.title});
 
-  final IconData icon;
+  final IconData? icon;
+  final String? emoji;
   final String title;
 
   @override
@@ -1121,7 +1369,10 @@ class SectionTitle extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Icon(icon, color: Theme.of(context).colorScheme.primary, size: 23),
+          if (emoji != null)
+            Text(emoji!, style: const TextStyle(fontSize: 25, height: 1))
+          else if (icon != null)
+            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 23),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -1207,14 +1458,33 @@ class _FullWidthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton.tonalIcon(
-      onPressed: onPressed,
-      icon: Icon(icon),
-      label: Text(label),
-      style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(46),
-        shape: const StadiumBorder(),
-        textStyle: const TextStyle(fontWeight: FontWeight.w800),
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      shape: StadiumBorder(side: BorderSide(color: context.borderSubtle)),
+      elevation: 0,
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        onTap: onPressed,
+        child: SizedBox(
+          height: 56,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1330,13 +1600,13 @@ class _PomodoroCheck extends StatelessWidget {
 
 class _FloatingIconButton extends StatelessWidget {
   const _FloatingIconButton({
-    required this.icon,
+    required this.glyph,
     required this.tooltip,
     required this.compact,
     required this.onPressed,
   });
 
-  final IconData icon;
+  final Widget glyph;
   final String tooltip;
   final bool compact;
   final VoidCallback onPressed;
@@ -1357,11 +1627,7 @@ class _FloatingIconButton extends StatelessWidget {
             child: SizedBox(
               width: size,
               height: size,
-              child: Icon(
-                icon,
-                color: Theme.of(context).colorScheme.primary,
-                size: compact ? 20 : 23,
-              ),
+              child: Center(child: glyph),
             ),
           ),
         ),

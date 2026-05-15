@@ -15,7 +15,7 @@ class PlannerData {
 
   factory PlannerData.defaults() {
     return PlannerData(
-      priorities: ['', '', ''],
+      priorities: [''],
       timeBlocks: [
         TimeBlock(id: createPlannerId('time'), time: '06:00 - 07:00', text: ''),
         TimeBlock(id: createPlannerId('time'), time: '07:00 - 12:00', text: ''),
@@ -82,7 +82,10 @@ class PlannerData {
     }
 
     return PlannerData(
-      priorities: priorities.isEmpty ? ['', '', ''] : priorities,
+      priorities:
+          priorities.isEmpty || priorities.every((item) => item.trim().isEmpty)
+          ? ['']
+          : priorities,
       timeBlocks: timeBlocks.isEmpty
           ? PlannerData.defaults().timeBlocks
           : timeBlocks,
