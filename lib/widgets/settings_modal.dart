@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
+import '../services/update_service.dart';
 import '../theme.dart';
 
 class SettingsModal extends StatelessWidget {
@@ -131,6 +132,18 @@ class SettingsModal extends StatelessWidget {
                           ),
                         )
                       : const SizedBox.shrink(),
+                ),
+                const SizedBox(height: 20),
+                const _CategoryLabel('업데이트 (Update)'),
+                _SettingTile(
+                  icon: Icons.system_update_rounded,
+                  title: '업데이트 확인',
+                  subtitle: '현재: $currentVersionName',
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    UpdateService.checkAndShowDialog(context);
+                  },
                 ),
               ],
             ),
