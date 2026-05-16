@@ -503,14 +503,15 @@ class _ModeToggleButton extends StatelessWidget {
     final primary = Theme.of(context).colorScheme.primary;
     final tertiary = Theme.of(context).colorScheme.tertiary;
     final color = isTodoPanel ? tertiary : primary;
-    final button = Material(
-      color: color.withValues(alpha: 0.11),
-      shape: StadiumBorder(
-        side: BorderSide(color: color.withValues(alpha: 0.22)),
-      ),
-      child: InkWell(
-        customBorder: const StadiumBorder(),
-        onTap: context.read<PlannerProvider>().togglePriorityTodoPanel,
+    final button = GestureDetector(
+      onTap: context.read<PlannerProvider>().togglePriorityTodoPanel,
+      child: DecoratedBox(
+        decoration: ShapeDecoration(
+          color: color.withValues(alpha: 0.11),
+          shape: StadiumBorder(
+            side: BorderSide(color: color.withValues(alpha: 0.22)),
+          ),
+        ),
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: fullWidth ? 18 : 16,
@@ -541,12 +542,9 @@ class _ModeToggleButton extends StatelessWidget {
       ),
     );
 
-    return Tooltip(
-      message: isTodoPanel ? '핵심 목표로 돌아가기' : '할 일 목록 열기',
-      child: fullWidth
-          ? SizedBox(width: double.infinity, child: button)
-          : button,
-    );
+    return fullWidth
+        ? SizedBox(width: double.infinity, child: button)
+        : button;
   }
 }
 
@@ -1717,7 +1715,6 @@ class _InlineDeleteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      tooltip: '삭제',
       onPressed: onPressed,
       icon: const Icon(Icons.close_rounded),
       color: context.mutedText,
@@ -1735,27 +1732,23 @@ class _PomodoroCheck extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    return Tooltip(
-      message: checked ? '완료됨' : '완료 체크',
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: checked ? primary : Colors.transparent,
-            border: Border.all(
-              color: checked ? primary : context.mutedText,
-              width: 2,
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: checked ? primary : Colors.transparent,
+          border: Border.all(
+            color: checked ? primary : context.mutedText,
+            width: 2,
           ),
-          child: checked
-              ? const Icon(Icons.check_rounded, size: 17, color: Colors.white)
-              : null,
         ),
+        child: checked
+            ? const Icon(Icons.check_rounded, size: 17, color: Colors.white)
+            : null,
       ),
     );
   }
@@ -1893,14 +1886,7 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
       ),
     );
 
-    if (widget.compact) {
-      return buttonBody;
-    }
-
-    return Tooltip(
-      message: widget.tooltip,
-      child: buttonBody,
-    );
+    return buttonBody;
   }
 }
 
@@ -1917,18 +1903,16 @@ class _MiniCircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF0F172A).withValues(alpha: 0.52)
-            : Colors.white.withValues(alpha: 0.58),
-        shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onPressed,
-          child: SizedBox(width: 34, height: 34, child: Icon(icon, size: 20)),
+    return GestureDetector(
+      onTap: onPressed,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF0F172A).withValues(alpha: 0.52)
+              : Colors.white.withValues(alpha: 0.58),
+          shape: BoxShape.circle,
         ),
+        child: SizedBox(width: 34, height: 34, child: Icon(icon, size: 20)),
       ),
     );
   }
@@ -1948,7 +1932,6 @@ class _DateArrowButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      tooltip: tooltip,
       onPressed: onPressed,
       icon: Icon(icon, size: 34),
       color: context.mutedText,

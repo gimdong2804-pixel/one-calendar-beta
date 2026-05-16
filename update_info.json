@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 12,
-  "versionName": "One UI 1.0 (Beta 12)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta12.apk",
-  "changelog": "버튼 클릭 시 회색 박스 버그 완전 수정, 인앱 다운로드 및 자동 설치 기능 추가"
+  "latestBuildNumber": 13,
+  "versionName": "One UI 1.0 (Beta 13)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta13.apk",
+  "changelog": "앱 전체 Tooltip/Material/InkWell 완전 제거로 회색 박스 버그 근본적 해결"
 }
