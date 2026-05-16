@@ -1859,7 +1859,7 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
 
         return Transform.scale(
           scale: scale,
-          child: child,
+          child: RepaintBoundary(child: child),
         );
       },
       child: GestureDetector(

@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 14,
-  "versionName": "One UI 1.0 (Beta 14)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta14.apk",
-  "changelog": "버튼 클릭 시 나타나는 회색 박스(Flutter 에러 위젯)의 근본 원인(AnimationController Dispose 오류) 완전 수정"
+  "latestBuildNumber": 15,
+  "versionName": "One UI 1.0 (Beta 15)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta15.apk",
+  "changelog": "버튼 클릭 시 나타나는 회색 박스의 근본 원인인 Impeller 렌더링 엔진의 BoxShadow 크기 변환(Transform.scale) 버그를 RepaintBoundary로 완전히 차단"
 }
