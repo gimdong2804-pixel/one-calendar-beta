@@ -1777,8 +1777,8 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
     with TickerProviderStateMixin {
   late final AnimationController _breatheController;
   late final Animation<double> _breatheAnim;
-  AnimationController? _bounceController;
-  Animation<double>? _bounceAnim;
+  late final AnimationController _bounceController;
+  late final Animation<double> _bounceAnim;
 
   @override
   void initState() {
@@ -1791,22 +1791,8 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
     _breatheAnim = Tween<double>(begin: 1.0, end: 1.03).animate(
       CurvedAnimation(parent: _breatheController, curve: Curves.easeInOut),
     );
-    // Start with delay for staggered effect
-    Future.delayed(widget.breatheDelay, () {
-      if (mounted) _breatheController.repeat(reverse: true);
-    });
-  }
-
-  @override
-  void dispose() {
-    _breatheController.dispose();
-    _bounceController?.dispose();
-    super.dispose();
-  }
-
-  void _handleTap() {
+    
     // Bounce animation on tap: scale 1 -> 0.85 -> 1.15 -> 0.95 -> 1
-    _bounceController?.dispose();
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -1818,11 +1804,26 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
       TweenSequenceItem(tween: Tween(begin: 0.95, end: 1.0), weight: 20),
     ]).animate(
       CurvedAnimation(
-        parent: _bounceController!,
+        parent: _bounceController,
         curve: const Cubic(0.34, 1.56, 0.64, 1),
       ),
     );
-    _bounceController!.forward(from: 0);
+
+    // Start with delay for staggered effect
+    Future.delayed(widget.breatheDelay, () {
+      if (mounted) _breatheController.repeat(reverse: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _breatheController.dispose();
+    _bounceController.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    _bounceController.forward(from: 0);
     widget.onPressed();
   }
 
@@ -1847,12 +1848,12 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
       animation: Listenable.merge([
         _breatheController,
         _bounceController,
-      ].nonNulls.toList()),
+      ]),
       builder: (context, child) {
         final breatheScale = _breatheAnim.value;
-        final bounceScale = _bounceAnim?.value ?? 1.0;
+        final bounceScale = _bounceAnim.value;
         // Pause breathing during bounce
-        final scale = (_bounceController?.isAnimating ?? false)
+        final scale = _bounceController.isAnimating
             ? bounceScale
             : breatheScale;
 
