@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// 현재 앱의 빌드 번호 (pubspec.yaml의 +N 부분과 일치시켜야 함)
-const int currentBuildNumber = 6;
-const String currentVersionName = 'One UI 1.0 (Beta 6)';
+const int currentBuildNumber = 7;
+const String currentVersionName = 'One UI 1.0 (Beta 7)';
 
 /// GitHub raw URL에서 update_info.json 읽기
 const String _updateInfoUrl =
@@ -42,8 +42,9 @@ class UpdateService {
   static Future<UpdateInfo?> checkForUpdate() async {
     try {
       final client = HttpClient();
+      client.connectionTimeout = const Duration(seconds: 5);
       final request = await client.getUrl(Uri.parse(_updateInfoUrl));
-      final response = await request.close();
+      final response = await request.close().timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
@@ -64,6 +65,7 @@ class UpdateService {
     showDialog(
       context: context,
       barrierDismissible: false,
+      useRootNavigator: true,
       builder: (_) => const AlertDialog(
         content: Row(
           children: [
@@ -78,7 +80,7 @@ class UpdateService {
     final info = await checkForUpdate();
 
     if (!context.mounted) return;
-    Navigator.of(context).pop(); // 로딩 닫기
+    Navigator.of(context, rootNavigator: true).pop(); // 로딩 닫기
 
     if (info == null) {
       if (!context.mounted) return;
