@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// 현재 앱의 빌드 번호 (pubspec.yaml의 +N 부분과 일치시켜야 함)
-const int currentBuildNumber = 11;
-const String currentVersionName = 'One UI 1.0 (Beta 11)';
+const int currentBuildNumber = 12;
+const String currentVersionName = 'One UI 1.0 (Beta 12)';
 
 /// GitHub raw URL에서 update_info.json 읽기
 const String _updateInfoUrl =
@@ -147,7 +149,7 @@ class UpdateService {
           FilledButton.icon(
             onPressed: () {
               Navigator.of(rootContext).pop();
-              _downloadUpdate(rootContext, info.downloadUrl);
+              _downloadAndInstall(rootContext, info.downloadUrl, info.versionName);
             },
             icon: const Icon(Icons.download),
             label: const Text('업데이트'),
@@ -157,24 +159,136 @@ class UpdateService {
     );
   }
 
-  /// 브라우저에서 APK 다운로드 열기
-  static Future<void> _downloadUpdate(BuildContext context, String url) async {
-    final uri = Uri.parse(url);
+  /// APK를 인앱으로 다운로드하고 자동으로 설치 화면을 띄움
+  static Future<void> _downloadAndInstall(
+    BuildContext context,
+    String url,
+    String versionName,
+  ) async {
+    // 진행률 표시용 ValueNotifier
+    final progress = ValueNotifier<double>(0.0);
+    final statusText = ValueNotifier<String>('다운로드 준비 중...');
+
+    final rootContext = Navigator.of(context, rootNavigator: true).context;
+    if (!rootContext.mounted) return;
+
+    // 다운로드 진행 다이얼로그
+    showDialog(
+      context: rootContext,
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          icon: const Icon(Icons.downloading, color: Color(0xFF4F46E5), size: 40),
+          title: const Text('업데이트 다운로드 중'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ValueListenableBuilder<double>(
+                valueListenable: progress,
+                builder: (_, value, _) => Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: value > 0 ? value : null,
+                        minHeight: 8,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '${(value * 100).toStringAsFixed(0)}%',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              ValueListenableBuilder<String>(
+                valueListenable: statusText,
+                builder: (_, value, _) => Text(
+                  value,
+                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
     try {
-      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      if (!launched) {
-        throw Exception('Could not launch $url');
+      // 캐시 디렉토리에 APK 저장
+      final dir = await getTemporaryDirectory();
+      final filePath = '${dir.path}/OneCalendar-update.apk';
+
+      // 기존 파일이 있으면 삭제
+      final file = File(filePath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+
+      statusText.value = '서버에서 다운로드 중...';
+
+      final dio = Dio();
+      await dio.download(
+        url,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total > 0) {
+            progress.value = received / total;
+            final receivedMB = (received / 1024 / 1024).toStringAsFixed(1);
+            final totalMB = (total / 1024 / 1024).toStringAsFixed(1);
+            statusText.value = '$receivedMB MB / $totalMB MB';
+          }
+        },
+      );
+
+      // 다운로드 완료
+      statusText.value = '설치 준비 중...';
+      progress.value = 1.0;
+
+      // 다이얼로그 닫기
+      if (rootContext.mounted) {
+        Navigator.of(rootContext, rootNavigator: true).pop();
+      }
+
+      // APK 설치 화면 열기
+      final result = await OpenFilex.open(filePath, type: 'application/vnd.android.package-archive');
+
+      if (result.type != ResultType.done) {
+        if (!rootContext.mounted) return;
+        ScaffoldMessenger.of(rootContext)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('설치를 열 수 없습니다: ${result.message}'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
       }
     } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context)
+      // 다이얼로그 닫기
+      if (rootContext.mounted) {
+        Navigator.of(rootContext, rootNavigator: true).pop();
+      }
+
+      if (!rootContext.mounted) return;
+      ScaffoldMessenger.of(rootContext)
         ..clearSnackBars()
         ..showSnackBar(
           SnackBar(
-            content: Text('다운로드 링크를 열 수 없습니다: $e'),
+            content: Text('다운로드 실패: $e'),
             behavior: SnackBarBehavior.floating,
           ),
         );
+    } finally {
+      progress.dispose();
+      statusText.dispose();
     }
   }
 }
