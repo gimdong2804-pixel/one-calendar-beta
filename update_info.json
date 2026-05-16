@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 18,
-  "versionName": "One UI 1.0 (Beta 18)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta18.apk",
-  "changelog": "목표(Priority) 항목 삭제 시 발생하는 레이아웃 버그 수정: 리스트 아이템의 Key를 인덱스 대신 고유 ID 기반으로 변경하여 삭제 애니메이션 상태가 잘못 유지되는 문제 해결"
+  "latestBuildNumber": 19,
+  "versionName": "One UI 1.0 (Beta 19)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta19.apk",
+  "changelog": "레거시 웹 앱의 아이콘 애니메이션과 Glassmorphism 버튼 디자인 복원"
 }

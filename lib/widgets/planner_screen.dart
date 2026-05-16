@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +10,7 @@ import '../models/planner_data.dart';
 import '../providers/planner_provider.dart';
 import '../providers/settings_provider.dart';
 import '../theme.dart';
+import 'animated_fab_icons.dart';
 import 'settings_modal.dart';
 
 class PlannerScreen extends StatelessWidget {
@@ -374,12 +376,7 @@ class _FloatingControls extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _FloatingIconButton(
-          glyph: _GradientGlyph(
-            size: isCompact ? 24 : 28,
-            child: Icon(
-              isDark ? Icons.dark_mode_outlined : Icons.wb_sunny_outlined,
-            ),
-          ),
+          glyph: AnimatedThemeIcon(isDark: isDark),
           tooltip: '테마 변경',
           compact: isCompact,
           breatheDelay: const Duration(milliseconds: 800),
@@ -390,12 +387,7 @@ class _FloatingControls extends StatelessWidget {
         ),
         SizedBox(width: isCompact ? 10 : 14),
         _FloatingIconButton(
-          glyph: settings.isSoundEnabled
-              ? _SoundGlyph(size: isCompact ? 24 : 28)
-              : _GradientGlyph(
-                  size: isCompact ? 24 : 28,
-                  child: const Icon(Icons.volume_off_outlined),
-                ),
+          glyph: AnimatedSoundIcon(isSoundEnabled: settings.isSoundEnabled),
           tooltip: '터치음 켜기/끄기',
           compact: isCompact,
           breatheDelay: const Duration(milliseconds: 1500),
@@ -404,12 +396,10 @@ class _FloatingControls extends StatelessWidget {
         ),
         SizedBox(width: isCompact ? 10 : 14),
         _FloatingIconButton(
-          glyph: _GradientGlyph(
-            size: isCompact ? 24 : 28,
-            child: const Icon(Icons.settings_outlined),
-          ),
+          glyph: const AnimatedSettingsIcon(),
           tooltip: '환경 설정',
           compact: isCompact,
+          isSettings: true,
           breatheDelay: Duration.zero,
           onPressed: () => showSettingsModal(context),
         ),
@@ -1771,6 +1761,7 @@ class _FloatingIconButton extends StatefulWidget {
     required this.compact,
     required this.onPressed,
     this.breatheDelay = Duration.zero,
+    this.isSettings = false,
   });
 
   final Widget glyph;
@@ -1778,6 +1769,7 @@ class _FloatingIconButton extends StatefulWidget {
   final bool compact;
   final VoidCallback onPressed;
   final Duration breatheDelay;
+  final bool isSettings;
 
   @override
   State<_FloatingIconButton> createState() => _FloatingIconButtonState();
@@ -1790,9 +1782,15 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnim;
 
+  late final AnimationController _hoverController;
+
   @override
   void initState() {
     super.initState();
+    _hoverController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
     // Breathing animation: 3s infinite, scale 1.0 <-> 1.03
     _breatheController = AnimationController(
       vsync: this,
@@ -1829,6 +1827,7 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
   void dispose() {
     _breatheController.dispose();
     _bounceController.dispose();
+    _hoverController.dispose();
     super.dispose();
   }
 
@@ -1858,43 +1857,85 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
       animation: Listenable.merge([
         _breatheController,
         _bounceController,
+        _hoverController,
       ]),
       builder: (context, child) {
         final breatheScale = _breatheAnim.value;
         final bounceScale = _bounceAnim.value;
-        // Pause breathing during bounce
+        final hoverScale = 1.0 + (_hoverController.value * 0.12); // scale 1.12
+        final hoverRot = _hoverController.value * 1.5708; // 90 degrees
+
+        // Pause breathing during bounce or hover
         final scale = _bounceController.isAnimating
             ? bounceScale
-            : breatheScale;
+            : (widget.isSettings && _hoverController.value > 0 ? hoverScale : breatheScale);
+
+        final hoverShadowOpacity = _hoverController.value;
 
         return Transform.scale(
           scale: scale,
-          child: RepaintBoundary(child: child),
+          child: RepaintBoundary(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (_) {
+                if (widget.isSettings) _hoverController.forward();
+              },
+              onTapUp: (_) {
+                if (widget.isSettings) _hoverController.reverse();
+                _handleTap();
+              },
+              onTapCancel: () {
+                if (widget.isSettings) _hoverController.reverse();
+              },
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: shadowColor,
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                    if (widget.isSettings)
+                      BoxShadow(
+                        color: Color.lerp(Colors.transparent, const Color(0x1E4F46E5), hoverShadowOpacity)!,
+                        blurRadius: 0,
+                        spreadRadius: 8 * hoverShadowOpacity,
+                      ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    child: Container(
+                      width: size,
+                      height: size,
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: widget.isSettings 
+                            ? Color.lerp(borderColor, Theme.of(context).colorScheme.primary, hoverShadowOpacity)!
+                            : borderColor, 
+                          width: 1.5
+                        ),
+                      ),
+                      child: Center(
+                        child: widget.isSettings
+                            ? Transform.rotate(
+                                angle: hoverRot,
+                                child: widget.glyph,
+                              )
+                            : widget.glyph,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         );
       },
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _handleTap,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: bgColor,
-            shape: BoxShape.circle,
-            border: Border.all(color: borderColor, width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: shadowColor,
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: SizedBox(
-            width: size,
-            height: size,
-            child: Center(child: widget.glyph),
-          ),
-        ),
-      ),
     );
 
     return buttonBody;
