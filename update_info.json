@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 5,
-  "versionName": "One UI 1.0 (Beta 5)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/app-release.apk",
-  "changelog": "앱 내 자동 업데이트 기능 추가, 상단 FAB 버튼 구버전 스타일 적용"
+  "latestBuildNumber": 6,
+  "versionName": "One UI 1.0 (Beta 6)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta6.apk",
+  "changelog": "업데이트 확인 시 인터넷 연결 오류 버그 수정 (INTERNET 권한 추가), 구문 오류 수정"
 }
