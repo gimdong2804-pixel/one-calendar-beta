@@ -349,6 +349,17 @@ class _SoundGlyphPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+class _ClampedCurve extends Curve {
+  const _ClampedCurve(this.curve);
+  final Curve curve;
+
+  @override
+  double transform(double t) {
+    return curve.transform(t).clamp(0.0, 1.0);
+  }
+}
+
+
 class _FloatingControls extends StatelessWidget {
   const _FloatingControls({required this.isCompact});
 
@@ -1787,7 +1798,7 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
       duration: const Duration(milliseconds: 3000),
     );
     _breatheAnim = Tween<double>(begin: 1.0, end: 1.03).animate(
-      CurvedAnimation(parent: _breatheController, curve: Curves.easeInOut),
+      CurvedAnimation(parent: _breatheController, curve: const _ClampedCurve(Curves.easeInOut)),
     );
     
     // Bounce animation on tap: scale 1 -> 0.85 -> 1.15 -> 0.95 -> 1
@@ -1803,7 +1814,7 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
     ]).animate(
       CurvedAnimation(
         parent: _bounceController,
-        curve: const Cubic(0.34, 1.56, 0.64, 1),
+        curve: const _ClampedCurve(Curves.easeInOut),
       ),
     );
 

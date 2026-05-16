@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 16,
-  "versionName": "One UI 1.0 (Beta 16)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta16.apk",
-  "changelog": "안드로이드 기본 Focus/Ripple 효과에 의해 좌측 네비게이션이 회색으로 점등되는 현상 수정"
+  "latestBuildNumber": 17,
+  "versionName": "One UI 1.0 (Beta 17)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta17.apk",
+  "changelog": "버튼 클릭 시 나타나는 회색 박스의 진짜 원인 수정 완료: 곡선 연산(Overshoot Curve)으로 인한 플러터 내부 수학적 충돌(Assertion Error) 방지"
 }
