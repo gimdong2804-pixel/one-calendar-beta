@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 7,
-  "versionName": "One UI 1.0 (Beta 7)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta7.apk",
-  "changelog": "업데이트 확인 중 무한 로딩되는 문제 수정 (타임아웃 및 다이얼로그 팝 방식 변경)"
+  "latestBuildNumber": 8,
+  "versionName": "One UI 1.0 (Beta 8)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta8.apk",
+  "changelog": "업데이트 확인 다이얼로그 무한 로딩 버그 완벽 수정 (최상위 컨텍스트 사용)"
 }

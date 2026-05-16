@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// 현재 앱의 빌드 번호 (pubspec.yaml의 +N 부분과 일치시켜야 함)
-const int currentBuildNumber = 7;
-const String currentVersionName = 'One UI 1.0 (Beta 7)';
+const int currentBuildNumber = 8;
+const String currentVersionName = 'One UI 1.0 (Beta 8)';
 
 /// GitHub raw URL에서 update_info.json 읽기
 const String _updateInfoUrl =
@@ -60,10 +60,13 @@ class UpdateService {
 
   /// 업데이트 확인 후 다이얼로그 표시
   static Future<void> checkAndShowDialog(BuildContext context) async {
+    // SettingsModal이 닫히면서 context가 unmounted 되는 것을 방지하기 위해 최상단 Navigator의 context를 가져옵니다.
+    final rootContext = Navigator.of(context, rootNavigator: true).context;
+
     // 로딩 표시
-    if (!context.mounted) return;
+    if (!rootContext.mounted) return;
     showDialog(
-      context: context,
+      context: rootContext,
       barrierDismissible: false,
       useRootNavigator: true,
       builder: (_) => const AlertDialog(
@@ -79,12 +82,12 @@ class UpdateService {
 
     final info = await checkForUpdate();
 
-    if (!context.mounted) return;
-    Navigator.of(context, rootNavigator: true).pop(); // 로딩 닫기
+    if (!rootContext.mounted) return;
+    Navigator.of(rootContext, rootNavigator: true).pop(); // 로딩 닫기
 
     if (info == null) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context)
+      if (!rootContext.mounted) return;
+      ScaffoldMessenger.of(rootContext)
         ..clearSnackBars()
         ..showSnackBar(
           const SnackBar(
@@ -96,16 +99,16 @@ class UpdateService {
     }
 
     if (!info.hasUpdate) {
-      if (!context.mounted) return;
+      if (!rootContext.mounted) return;
       showDialog(
-        context: context,
+        context: rootContext,
         builder: (_) => AlertDialog(
           icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
           title: const Text('최신 버전입니다'),
           content: Text('현재 버전: $currentVersionName'),
           actions: [
             FilledButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(rootContext).pop(),
               child: const Text('확인'),
             ),
           ],
@@ -115,9 +118,9 @@ class UpdateService {
     }
 
     // 업데이트 있음!
-    if (!context.mounted) return;
+    if (!rootContext.mounted) return;
     showDialog(
-      context: context,
+      context: rootContext,
       builder: (_) => AlertDialog(
         icon: const Icon(Icons.system_update, color: Color(0xFF4F46E5), size: 48),
         title: const Text('새 업데이트가 있습니다!'),
@@ -138,13 +141,13 @@ class UpdateService {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(rootContext).pop(),
             child: const Text('나중에'),
           ),
           FilledButton.icon(
             onPressed: () {
-              Navigator.of(context).pop();
-              _downloadUpdate(context, info.downloadUrl);
+              Navigator.of(rootContext).pop();
+              _downloadUpdate(rootContext, info.downloadUrl);
             },
             icon: const Icon(Icons.download),
             label: const Text('업데이트'),
