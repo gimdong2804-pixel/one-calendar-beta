@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 8,
-  "versionName": "One UI 1.0 (Beta 8)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta8.apk",
-  "changelog": "업데이트 확인 다이얼로그 무한 로딩 버그 완벽 수정 (최상위 컨텍스트 사용)"
+  "latestBuildNumber": 9,
+  "versionName": "One UI 1.0 (Beta 9)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta9.apk",
+  "changelog": "상단 버튼 클릭 시 이상한 회색 박스(잘못된 위치의 툴팁)가 나타나는 현상 수정"
 }

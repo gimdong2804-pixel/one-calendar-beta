@@ -1850,54 +1850,60 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
         ? Colors.black.withValues(alpha: 0.4)
         : Colors.black.withValues(alpha: 0.05);
 
-    return Tooltip(
-      message: widget.tooltip,
-      child: AnimatedBuilder(
-        animation: Listenable.merge([
-          _breatheController,
-          _bounceController,
-        ].nonNulls.toList()),
-        builder: (context, child) {
-          final breatheScale = _breatheAnim.value;
-          final bounceScale = _bounceAnim?.value ?? 1.0;
-          // Pause breathing during bounce
-          final scale = (_bounceController?.isAnimating ?? false)
-              ? bounceScale
-              : breatheScale;
+    final buttonBody = AnimatedBuilder(
+      animation: Listenable.merge([
+        _breatheController,
+        _bounceController,
+      ].nonNulls.toList()),
+      builder: (context, child) {
+        final breatheScale = _breatheAnim.value;
+        final bounceScale = _bounceAnim?.value ?? 1.0;
+        // Pause breathing during bounce
+        final scale = (_bounceController?.isAnimating ?? false)
+            ? bounceScale
+            : breatheScale;
 
-          return Transform.scale(
-            scale: scale,
-            child: child,
-          );
-        },
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: bgColor,
-            shape: BoxShape.circle,
-            border: Border.all(color: borderColor, width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: shadowColor,
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            shape: const CircleBorder(),
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: _handleTap,
-              child: SizedBox(
-                width: size,
-                height: size,
-                child: Center(child: widget.glyph),
-              ),
+        return Transform.scale(
+          scale: scale,
+          child: child,
+        );
+      },
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: bgColor,
+          shape: BoxShape.circle,
+          border: Border.all(color: borderColor, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: shadowColor,
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          shape: const CircleBorder(),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: _handleTap,
+            child: SizedBox(
+              width: size,
+              height: size,
+              child: Center(child: widget.glyph),
             ),
           ),
         ),
       ),
+    );
+
+    if (widget.compact) {
+      return buttonBody;
+    }
+
+    return Tooltip(
+      message: widget.tooltip,
+      child: buttonBody,
     );
   }
 }
