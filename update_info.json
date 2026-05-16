@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 17,
-  "versionName": "One UI 1.0 (Beta 17)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta17.apk",
-  "changelog": "버튼 클릭 시 나타나는 회색 박스의 진짜 원인 수정 완료: 곡선 연산(Overshoot Curve)으로 인한 플러터 내부 수학적 충돌(Assertion Error) 방지"
+  "latestBuildNumber": 18,
+  "versionName": "One UI 1.0 (Beta 18)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta18.apk",
+  "changelog": "목표(Priority) 항목 삭제 시 발생하는 레이아웃 버그 수정: 리스트 아이템의 Key를 인덱스 대신 고유 ID 기반으로 변경하여 삭제 애니메이션 상태가 잘못 유지되는 문제 해결"
 }

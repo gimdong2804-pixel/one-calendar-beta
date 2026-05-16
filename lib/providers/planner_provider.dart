@@ -69,12 +69,12 @@ class PlannerProvider with ChangeNotifier {
 
   void updatePriority(int index, String value) {
     if (index < 0 || index >= _data.priorities.length) return;
-    _data.priorities[index] = value;
+    _data.priorities[index].text = value;
     _scheduleSave();
   }
 
   void addPriority() {
-    _data.priorities.add('');
+    _data.priorities.add(PriorityEntry(id: createPlannerId('prior'), text: ''));
     _scheduleSave(notify: true);
   }
 
@@ -169,9 +169,9 @@ class PlannerProvider with ChangeNotifier {
   void applyAiExample() {
     _data = PlannerData(
       priorities: [
-        '수학 기출 2회분 오답까지 끝내기',
-        '영어 지문 12개 분석하고 단어 정리',
-        '오늘 배운 개념 20분 안에 백지 복습',
+        PriorityEntry(id: createPlannerId('prior'), text: '수학 기출 2회분 오답까지 끝내기'),
+        PriorityEntry(id: createPlannerId('prior'), text: '영어 지문 12개 분석하고 단어 정리'),
+        PriorityEntry(id: createPlannerId('prior'), text: '오늘 배운 개념 20분 안에 백지 복습'),
       ],
       timeBlocks: [
         TimeBlock(

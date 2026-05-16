@@ -578,10 +578,11 @@ class PriorityPanel extends StatelessWidget {
           itemCount: priorities.length,
           onReorder: planner.reorderPriorities,
           itemBuilder: (context, index) {
+            final entry = priorities[index];
             return PriorityRow(
-              key: ValueKey('priority-$dateKey-$index'),
+              key: ValueKey(entry.id),
               index: index,
-              value: priorities[index],
+              entry: entry,
             );
           },
         ),
@@ -602,10 +603,10 @@ const _springPopDuration = Duration(milliseconds: 400);
 const _popOutDuration = Duration(milliseconds: 350);
 
 class PriorityRow extends StatefulWidget {
-  const PriorityRow({super.key, required this.index, required this.value});
+  const PriorityRow({super.key, required this.index, required this.entry});
 
   final int index;
-  final String value;
+  final PriorityEntry entry;
 
   @override
   State<PriorityRow> createState() => _PriorityRowState();
@@ -680,7 +681,7 @@ class _PriorityRowState extends State<PriorityRow>
               padding: const EdgeInsets.only(bottom: 18),
               child: _PriorityMobileCard(
                 index: widget.index,
-                value: widget.value,
+                value: widget.entry.text,
                 onChanged: (next) =>
                     provider.updatePriority(widget.index, next),
                 onDelete: () => _animateOut(
@@ -715,7 +716,7 @@ class _PriorityRowState extends State<PriorityRow>
                     const SizedBox(width: 12),
                     Expanded(
                       child: TextFormField(
-                        initialValue: widget.value,
+                        initialValue: widget.entry.text,
                         minLines: 1,
                         maxLines: 3,
                         textInputAction: TextInputAction.newline,

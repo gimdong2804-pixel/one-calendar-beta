@@ -7,7 +7,7 @@ class PlannerData {
     required this.feedback,
   });
 
-  final List<String> priorities;
+  final List<PriorityEntry> priorities;
   final List<TimeBlock> timeBlocks;
   final List<TodoEntry> todos;
   final List<PomodoroTask> pomodoros;
@@ -15,7 +15,7 @@ class PlannerData {
 
   factory PlannerData.defaults() {
     return PlannerData(
-      priorities: [''],
+      priorities: [PriorityEntry(id: createPlannerId('prior'), text: '')],
       timeBlocks: [
         TimeBlock(id: createPlannerId('time'), time: '06:00 - 07:00', text: ''),
         TimeBlock(id: createPlannerId('time'), time: '07:00 - 12:00', text: ''),
@@ -41,7 +41,7 @@ class PlannerData {
   }
 
   factory PlannerData.fromJson(Map<String, dynamic> json) {
-    final priorities = _stringList(json['priors']);
+    final prioritiesStrings = _stringList(json['priors']);
     final timeBlocks = _objectList(
       json['timeBlocks'],
     ).map(TimeBlock.fromJson).toList(growable: true);
@@ -82,10 +82,12 @@ class PlannerData {
     }
 
     return PlannerData(
-      priorities:
-          priorities.isEmpty || priorities.every((item) => item.trim().isEmpty)
-          ? ['']
-          : priorities,
+      priorities: prioritiesStrings.isEmpty ||
+              prioritiesStrings.every((item) => item.trim().isEmpty)
+          ? [PriorityEntry(id: createPlannerId('prior'), text: '')]
+          : prioritiesStrings
+              .map((s) => PriorityEntry(id: createPlannerId('prior'), text: s))
+              .toList(growable: true),
       timeBlocks: timeBlocks.isEmpty
           ? PlannerData.defaults().timeBlocks
           : timeBlocks,
@@ -97,7 +99,7 @@ class PlannerData {
 
   Map<String, dynamic> toJson() {
     return {
-      'priors': priorities,
+      'priors': priorities.map((p) => p.text).toList(),
       'timeBlocks': timeBlocks.map((block) => block.toJson()).toList(),
       'todos': todos.map((todo) => todo.toJson()).toList(),
       'pomos': pomodoros.map((task) => task.title).toList(),
@@ -224,3 +226,10 @@ String _stripHtml(String value) {
       .replaceAll('&nbsp;', ' ')
       .trim();
 }
+
+class PriorityEntry {
+  PriorityEntry({required this.id, required this.text});
+  final String id;
+  String text;
+}
+
