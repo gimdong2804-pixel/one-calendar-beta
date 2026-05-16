@@ -146,8 +146,7 @@ class _DesktopDateHeader extends StatelessWidget {
               tooltip: '이전 날짜',
               onPressed: () => unawaited(planner.changeDate(-1)),
             ),
-            InkWell(
-              borderRadius: BorderRadius.circular(24),
+            GestureDetector(
               onTap: () => _pickDate(context),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -209,8 +208,7 @@ class _MobileDateDock extends StatelessWidget {
                 onPressed: () => unawaited(planner.changeDate(-1)),
               ),
               Expanded(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(18),
+                child: GestureDetector(
                   onTap: () => _pickDate(context),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 2),

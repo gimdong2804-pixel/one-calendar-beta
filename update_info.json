@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 15,
-  "versionName": "One UI 1.0 (Beta 15)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta15.apk",
-  "changelog": "버튼 클릭 시 나타나는 회색 박스의 근본 원인인 Impeller 렌더링 엔진의 BoxShadow 크기 변환(Transform.scale) 버그를 RepaintBoundary로 완전히 차단"
+  "latestBuildNumber": 16,
+  "versionName": "One UI 1.0 (Beta 16)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta16.apk",
+  "changelog": "안드로이드 기본 Focus/Ripple 효과에 의해 좌측 네비게이션이 회색으로 점등되는 현상 수정"
 }

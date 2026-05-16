@@ -70,6 +70,11 @@ class AppTheme {
         surface: surface,
         onSurface: textPrimary,
       ),
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      focusColor: Colors.transparent,
+      splashFactory: NoSplash.splashFactory,
       useMaterial3: true,
       fontFamily: 'Pretendard',
       fontFamilyFallback: const [
