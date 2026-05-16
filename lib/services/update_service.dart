@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// 현재 앱의 빌드 번호 (pubspec.yaml의 +N 부분과 일치시켜야 함)
-const int currentBuildNumber = 10;
-const String currentVersionName = 'One UI 1.0 (Beta 10)';
+const int currentBuildNumber = 11;
+const String currentVersionName = 'One UI 1.0 (Beta 11)';
 
 /// GitHub raw URL에서 update_info.json 읽기
 const String _updateInfoUrl =

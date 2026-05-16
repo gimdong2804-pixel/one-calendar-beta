@@ -107,6 +107,9 @@ class AppTheme {
         hintStyle: TextStyle(color: textMuted, fontWeight: FontWeight.w500),
       ),
       iconTheme: IconThemeData(color: textSecondary),
+      tooltipTheme: const TooltipThemeData(
+        triggerMode: TooltipTriggerMode.manual,
+      ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.android: ZoomPageTransitionsBuilder(),
