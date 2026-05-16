@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// 현재 앱의 빌드 번호 (pubspec.yaml의 +N 부분과 일치시켜야 함)
-const int currentBuildNumber = 9;
-const String currentVersionName = 'One UI 1.0 (Beta 9)';
+const int currentBuildNumber = 10;
+const String currentVersionName = 'One UI 1.0 (Beta 10)';
 
 /// GitHub raw URL에서 update_info.json 읽기
 const String _updateInfoUrl =
@@ -160,15 +160,18 @@ class UpdateService {
   /// 브라우저에서 APK 다운로드 열기
   static Future<void> _downloadUpdate(BuildContext context, String url) async {
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        throw Exception('Could not launch $url');
+      }
+    } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(
-          const SnackBar(
-            content: Text('다운로드 링크를 열 수 없습니다.'),
+          SnackBar(
+            content: Text('다운로드 링크를 열 수 없습니다: $e'),
             behavior: SnackBarBehavior.floating,
           ),
         );
