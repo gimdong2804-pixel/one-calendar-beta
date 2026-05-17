@@ -137,14 +137,14 @@ class _SoundPainter extends CustomPainter {
     if (!isSoundEnabled) {
       canvas.drawPath(_soundBodyPath, _soundOffPaint);
       final wavePaint = Paint()
-        ..color = _soundOffPaint.color.withOpacity(0.4)
+        ..color = _soundOffPaint.color.withValues(alpha: 0.4)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.2
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round;
       canvas.drawPath(_soundWave1Path, wavePaint);
       final linePaint = Paint()
-        ..color = _soundOffPaint.color.withOpacity(0.8)
+        ..color = _soundOffPaint.color.withValues(alpha: 0.8)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.2
         ..strokeCap = StrokeCap.round
@@ -186,7 +186,7 @@ class _SoundPainter extends CustomPainter {
       
       final paint = Paint()
         ..shader = _soundGradient.shader
-        ..color = Colors.white.withOpacity(opacity)
+        ..color = Colors.white.withValues(alpha: opacity)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.2
         ..strokeCap = StrokeCap.round
@@ -221,6 +221,7 @@ class AnimatedThemeIcon extends StatelessWidget {
           width: 24,
           height: 24,
           // Dark mode: Sun goes hidden, rotated 90, scaled 0.5
+          // ignore: deprecated_member_use
           transform: isDark
               ? (Matrix4.identity()..translate(12.0, 12.0)..rotateZ(1.5708)..scale(0.5)..translate(-12.0, -12.0))
               : Matrix4.identity(),
@@ -240,6 +241,7 @@ class AnimatedThemeIcon extends StatelessWidget {
           width: 24,
           height: 24,
           // Light mode: Moon goes hidden, rotated -90, scaled 0.5
+          // ignore: deprecated_member_use
           transform: isDark
               ? Matrix4.identity()
               : (Matrix4.identity()..translate(12.0, 12.0)..rotateZ(-1.5708)..scale(0.5)..translate(-12.0, -12.0)),

@@ -280,76 +280,7 @@ class _GradientGlyph extends StatelessWidget {
   }
 }
 
-class _SoundGlyph extends StatelessWidget {
-  const _SoundGlyph({this.size = 24});
 
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return _GradientGlyph(
-      size: size,
-      child: CustomPaint(painter: _SoundGlyphPainter()),
-    );
-  }
-}
-
-class _SoundGlyphPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = Offset.zero & size;
-    final paint = Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
-      ).createShader(rect)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.11
-      ..strokeCap = StrokeCap.round;
-
-    final bar = RRect.fromRectAndRadius(
-      Rect.fromLTWH(
-        size.width * 0.18,
-        size.height * 0.28,
-        size.width * 0.2,
-        size.height * 0.48,
-      ),
-      Radius.circular(size.width * 0.12),
-    );
-    canvas.drawRRect(bar, paint);
-    canvas.drawArc(
-      Rect.fromLTWH(
-        size.width * 0.46,
-        size.height * 0.32,
-        size.width * 0.26,
-        size.height * 0.36,
-      ),
-      -math.pi / 3,
-      math.pi * 2 / 3,
-      false,
-      paint,
-    );
-    final outerPaint = Paint()
-      ..shader = paint.shader
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.095
-      ..strokeCap = StrokeCap.round;
-    canvas.drawArc(
-      Rect.fromLTWH(
-        size.width * 0.56,
-        size.height * 0.18,
-        size.width * 0.32,
-        size.height * 0.64,
-      ),
-      -math.pi / 3,
-      math.pi * 2 / 3,
-      false,
-      outerPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
 
 class _ClampedCurve extends Curve {
   const _ClampedCurve(this.curve);
@@ -396,10 +327,9 @@ class _FloatingControls extends StatelessWidget {
         ),
         SizedBox(width: isCompact ? 10 : 14),
         _FloatingIconButton(
-          glyph: const AnimatedSettingsIcon(),
+          glyph: const Icon(Icons.settings_outlined),
           tooltip: '환경 설정',
           compact: isCompact,
-          isSettings: true,
           breatheDelay: Duration.zero,
           onPressed: () => showSettingsModal(context),
         ),
@@ -553,7 +483,6 @@ class PriorityPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final planner = context.watch<PlannerProvider>();
-    final dateKey = plannerDateKey(planner.currentDate);
     final priorities = planner.data.priorities;
 
     return Column(
@@ -1761,7 +1690,6 @@ class _FloatingIconButton extends StatefulWidget {
     required this.compact,
     required this.onPressed,
     this.breatheDelay = Duration.zero,
-    this.isSettings = false,
   });
 
   final Widget glyph;
@@ -1769,7 +1697,6 @@ class _FloatingIconButton extends StatefulWidget {
   final bool compact;
   final VoidCallback onPressed;
   final Duration breatheDelay;
-  final bool isSettings;
 
   @override
   State<_FloatingIconButton> createState() => _FloatingIconButtonState();
@@ -1782,15 +1709,9 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnim;
 
-  late final AnimationController _hoverController;
-
   @override
   void initState() {
     super.initState();
-    _hoverController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
     // Breathing animation: 3s infinite, scale 1.0 <-> 1.03
     _breatheController = AnimationController(
       vsync: this,
@@ -1827,7 +1748,6 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
   void dispose() {
     _breatheController.dispose();
     _bounceController.dispose();
-    _hoverController.dispose();
     super.dispose();
   }
 
@@ -1857,36 +1777,21 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
       animation: Listenable.merge([
         _breatheController,
         _bounceController,
-        _hoverController,
       ]),
       builder: (context, child) {
         final breatheScale = _breatheAnim.value;
         final bounceScale = _bounceAnim.value;
-        final hoverScale = 1.0 + (_hoverController.value * 0.12); // scale 1.12
-        final hoverRot = _hoverController.value * 1.5708; // 90 degrees
 
-        // Pause breathing during bounce or hover
         final scale = _bounceController.isAnimating
             ? bounceScale
-            : (widget.isSettings && _hoverController.value > 0 ? hoverScale : breatheScale);
-
-        final hoverShadowOpacity = _hoverController.value;
+            : breatheScale;
 
         return Transform.scale(
           scale: scale,
           child: RepaintBoundary(
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTapDown: (_) {
-                if (widget.isSettings) _hoverController.forward();
-              },
-              onTapUp: (_) {
-                if (widget.isSettings) _hoverController.reverse();
-                _handleTap();
-              },
-              onTapCancel: () {
-                if (widget.isSettings) _hoverController.reverse();
-              },
+              onTap: _handleTap,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -1896,12 +1801,6 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
                       blurRadius: 20,
                       offset: const Offset(0, 4),
                     ),
-                    if (widget.isSettings)
-                      BoxShadow(
-                        color: Color.lerp(Colors.transparent, const Color(0x1E4F46E5), hoverShadowOpacity)!,
-                        blurRadius: 0,
-                        spreadRadius: 8 * hoverShadowOpacity,
-                      ),
                   ],
                 ),
                 child: ClipOval(
@@ -1914,19 +1813,12 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
                         color: bgColor,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: widget.isSettings 
-                            ? Color.lerp(borderColor, Theme.of(context).colorScheme.primary, hoverShadowOpacity)!
-                            : borderColor, 
+                          color: borderColor, 
                           width: 1.5
                         ),
                       ),
                       child: Center(
-                        child: widget.isSettings
-                            ? Transform.rotate(
-                                angle: hoverRot,
-                                child: widget.glyph,
-                              )
-                            : widget.glyph,
+                        child: widget.glyph,
                       ),
                     ),
                   ),

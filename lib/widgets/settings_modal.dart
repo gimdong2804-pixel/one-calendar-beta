@@ -5,170 +5,161 @@ import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
 import '../services/update_service.dart';
-import '../theme.dart';
 
-class SettingsModal extends StatelessWidget {
-  const SettingsModal({super.key});
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // One UI background is typically completely black in dark mode
+    final bgColor = isDark ? Colors.black : const Color(0xFFF2F2F7);
 
-    return SafeArea(
-      top: false,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-            border: Border.all(color: context.borderSubtle),
+    return Scaffold(
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        title: const Text('설정', style: TextStyle(fontWeight: FontWeight.w700)),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        children: [
+          // Profile Section
+          _SettingGroup(
+            children: [
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                title: const Text('김동현', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+                subtitle: const Text('삼성 계정'),
+                trailing: const CircleAvatar(
+                  radius: 26,
+                  backgroundColor: Colors.grey,
+                  child: Icon(Icons.person, color: Colors.white, size: 30),
+                ),
+                onTap: () {},
+              ),
+            ],
           ),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Center(
-                  child: Container(
-                    width: 44,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: context.borderSubtle,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '설정',
-                        style: Theme.of(context).textTheme.titleLarge,
+          const SizedBox(height: 16),
+
+          // Decoration Settings
+          _SettingGroup(
+            children: [
+              _SettingTile(
+                icon: Icons.palette_rounded,
+                iconColor: Colors.blueAccent,
+                title: '테마 설정',
+                trailing: Switch(
+                  value: isDark,
+                  onChanged: (value) {
+                    unawaited(
+                      settings.setThemeMode(
+                        value ? ThemeMode.dark : ThemeMode.light,
                       ),
-                    ),
-                    IconButton(
-                      tooltip: '닫기',
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close_rounded),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                const _CategoryLabel('꾸미기 (Decoration)'),
-                _SettingTile(
-                  icon: Icons.palette_rounded,
-                  title: '테마 설정',
-                  subtitle: '라이트/다크 모드와 외부 버튼 표시',
-                  trailing: Switch(
-                    value: isDark,
-                    onChanged: (value) {
-                      unawaited(
-                        settings.setThemeMode(
-                          value ? ThemeMode.dark : ThemeMode.light,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                _SettingTile(
-                  icon: Icons.tune_rounded,
-                  title: '액션 바 커스텀',
-                  subtitle: '순서 변경, 블러 강도, 버튼 표시',
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () =>
-                      _showSnack(context, '액션 바 세부 커스텀은 다음 단계에서 연결됩니다.'),
-                ),
-                _SettingTile(
-                  icon: Icons.motion_photos_auto_rounded,
-                  title: '애니메이션 설정',
-                  subtitle: '전환 효과 및 스타일 커스텀',
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => _showSnack(
-                    context,
-                    '애니메이션 옵션은 Flutter 전환 효과 정리 후 연결됩니다.',
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const _CategoryLabel('앱 설정 (General)'),
-                _SettingTile(
-                  icon: settings.isSoundEnabled
-                      ? Icons.volume_up_rounded
-                      : Icons.volume_off_rounded,
-                  title: '소리 설정',
-                  subtitle: '터치음 효과 켜기',
-                  trailing: Switch(
-                    value: settings.isSoundEnabled,
-                    onChanged: (value) =>
-                        unawaited(settings.setSoundEnabled(value)),
-                  ),
-                ),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 180),
-                  child: settings.isSoundEnabled
-                      ? Padding(
-                          key: const ValueKey('volume'),
-                          padding: const EdgeInsets.fromLTRB(16, 6, 16, 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '소리 크기: ${(settings.soundVolume * 100).round()}%',
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                              Slider(
-                                value: settings.soundVolume,
-                                min: 0,
-                                max: 1,
-                                divisions: 20,
-                                onChanged: (value) =>
-                                    unawaited(settings.setSoundVolume(value)),
-                              ),
-                            ],
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
-                const SizedBox(height: 20),
-                const _CategoryLabel('업데이트 (Update)'),
-                _SettingTile(
-                  icon: Icons.system_update_rounded,
-                  title: '업데이트 확인',
-                  subtitle: '현재: $currentVersionName',
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    UpdateService.checkAndShowDialog(context);
+                    );
                   },
                 ),
-              ],
-            ),
+              ),
+              _Divider(),
+              _SettingTile(
+                icon: Icons.tune_rounded,
+                iconColor: Colors.indigoAccent,
+                title: '액션 바 커스텀',
+                onTap: () => _showSnack(context, '액션 바 세부 커스텀은 다음 단계에서 연결됩니다.'),
+              ),
+              _Divider(),
+              _SettingTile(
+                icon: Icons.motion_photos_auto_rounded,
+                iconColor: Colors.purpleAccent,
+                title: '애니메이션 설정',
+                onTap: () => _showSnack(context, '애니메이션 옵션은 Flutter 전환 효과 정리 후 연결됩니다.'),
+              ),
+            ],
           ),
-        ),
+          const SizedBox(height: 16),
+
+          // App Settings (Sound)
+          _SettingGroup(
+            children: [
+              _SettingTile(
+                icon: settings.isSoundEnabled
+                    ? Icons.volume_up_rounded
+                    : Icons.volume_off_rounded,
+                iconColor: Colors.lightBlue,
+                title: '소리 설정',
+                trailing: Switch(
+                  value: settings.isSoundEnabled,
+                  onChanged: (value) => unawaited(settings.setSoundEnabled(value)),
+                ),
+              ),
+              if (settings.isSoundEnabled) ...[
+                _Divider(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '소리 크기: ${(settings.soundVolume * 100).round()}%',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      Slider(
+                        value: settings.soundVolume,
+                        min: 0,
+                        max: 1,
+                        divisions: 20,
+                        onChanged: (value) => unawaited(settings.setSoundVolume(value)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Update Settings
+          _SettingGroup(
+            children: [
+              _SettingTile(
+                icon: Icons.system_update_rounded,
+                iconColor: Colors.teal,
+                title: '업데이트 확인',
+                subtitle: '현재: $currentVersionName',
+                onTap: () {
+                  UpdateService.checkAndShowDialog(context);
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
 }
 
-class _CategoryLabel extends StatelessWidget {
-  const _CategoryLabel(this.label);
+class _SettingGroup extends StatelessWidget {
+  const _SettingGroup({required this.children});
 
-  final String label;
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 10),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          fontWeight: FontWeight.w900,
-          color: context.mutedText,
-        ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: children,
       ),
     );
   }
@@ -177,54 +168,77 @@ class _CategoryLabel extends StatelessWidget {
 class _SettingTile extends StatelessWidget {
   const _SettingTile({
     required this.icon,
+    required this.iconColor,
     required this.title,
-    required this.subtitle,
-    required this.trailing,
+    this.subtitle,
+    this.trailing,
     this.onTap,
   });
 
   final IconData icon;
+  final Color iconColor;
   final String title;
-  final String subtitle;
-  final Widget trailing;
+  final String? subtitle;
+  final Widget? trailing;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: context.borderSubtle),
-      ),
-      child: ListTile(
-        onTap: onTap,
-        leading: Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: context.softInput,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: Theme.of(context).colorScheme.primary),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return ListTile(
+      onTap: onTap,
+      leading: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: iconColor,
+          shape: BoxShape.circle,
         ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
-        subtitle: Text(subtitle),
-        trailing: trailing,
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+      subtitle: subtitle != null ? Text(subtitle!) : null,
+      trailing: trailing ?? (onTap != null ? Icon(Icons.chevron_right_rounded, color: isDark ? Colors.white54 : Colors.black54) : null),
+    );
+  }
+}
+
+class _Divider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.only(left: 60, right: 16),
+      child: Divider(
+        height: 1,
+        thickness: 0.5,
+        color: isDark ? Colors.white12 : Colors.black12,
       ),
     );
   }
 }
 
 void showSettingsModal(BuildContext context) {
-  showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withValues(alpha: 0.36),
-    builder: (context) =>
-        const Align(alignment: Alignment.bottomCenter, child: SettingsModal()),
+  Navigator.of(context).push(
+    PageRouteBuilder<void>(
+      pageBuilder: (context, animation, secondaryAnimation) => const SettingsScreen(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOutCubic;
+
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 300),
+      reverseTransitionDuration: const Duration(milliseconds: 300),
+    ),
   );
 }
 

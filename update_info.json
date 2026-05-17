@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 19,
-  "versionName": "One UI 1.0 (Beta 19)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta19.apk",
-  "changelog": "레거시 웹 앱의 아이콘 애니메이션과 Glassmorphism 버튼 디자인 복원"
+  "latestBuildNumber": 20,
+  "versionName": "One UI 1.0 (Beta 20)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta20.apk",
+  "changelog": "설정 화면 풀스크린 슬라이드 UI 개편 및 린트 경고 해결"
 }
