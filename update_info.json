@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 20,
-  "versionName": "One UI 1.0 (Beta 20)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta20.apk",
-  "changelog": "Beta 21 APK 서명키 불일치로 인한 업데이트 설치 실패를 확인하여 업데이트 배포를 임시 중지했습니다."
+  "latestBuildNumber": 22,
+  "versionName": "One UI 1.0 (Beta 22)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta22.apk",
+  "changelog": "고정 release keystore로 서명 체계를 전환했습니다. Beta 20 이하에서 넘어오는 경우 기존 앱을 삭제한 뒤 새로 설치해야 하며, 이후 Beta 22부터는 같은 키로 업데이트됩니다."
 }
