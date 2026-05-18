@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 21,
-  "versionName": "One UI 1.0 (Beta 21)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta21.apk",
-  "changelog": "상단 플로팅 버튼 색상 통일, 할 일 추가/삭제 애니메이션 통일, 모바일 타임 블로킹 UI 안정화 및 키보드 겹침 수정"
+  "latestBuildNumber": 20,
+  "versionName": "One UI 1.0 (Beta 20)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta20.apk",
+  "changelog": "Beta 21 APK 서명키 불일치로 인한 업데이트 설치 실패를 확인하여 업데이트 배포를 임시 중지했습니다."
 }
