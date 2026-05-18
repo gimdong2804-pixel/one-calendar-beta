@@ -221,9 +221,8 @@ class AnimatedThemeIcon extends StatelessWidget {
           width: 24,
           height: 24,
           // Dark mode: Sun goes hidden, rotated 90, scaled 0.5
-          // ignore: deprecated_member_use
           transform: isDark
-              ? (Matrix4.identity()..translate(12.0, 12.0)..rotateZ(1.5708)..scale(0.5)..translate(-12.0, -12.0))
+              ? (Matrix4.identity()..multiply(Matrix4.translationValues(12.0, 12.0, 0.0))..rotateZ(1.5708)..multiply(Matrix4.diagonal3Values(0.5, 0.5, 1.0))..multiply(Matrix4.translationValues(-12.0, -12.0, 0.0)))
               : Matrix4.identity(),
           child: AnimatedOpacity(
             duration: const Duration(milliseconds: 400),
@@ -241,10 +240,9 @@ class AnimatedThemeIcon extends StatelessWidget {
           width: 24,
           height: 24,
           // Light mode: Moon goes hidden, rotated -90, scaled 0.5
-          // ignore: deprecated_member_use
           transform: isDark
               ? Matrix4.identity()
-              : (Matrix4.identity()..translate(12.0, 12.0)..rotateZ(-1.5708)..scale(0.5)..translate(-12.0, -12.0)),
+              : (Matrix4.identity()..multiply(Matrix4.translationValues(12.0, 12.0, 0.0))..rotateZ(-1.5708)..multiply(Matrix4.diagonal3Values(0.5, 0.5, 1.0))..multiply(Matrix4.translationValues(-12.0, -12.0, 0.0))),
           child: AnimatedOpacity(
             duration: const Duration(milliseconds: 400),
             curve: Curves.ease,

@@ -139,7 +139,7 @@ class PlannerProvider with ChangeNotifier {
   void toggleTodoSelection(int index, bool selected) {
     if (index < 0 || index >= _data.todos.length) return;
     _data.todos[index].selected = selected;
-    notifyListeners();
+    _scheduleSave(notify: true);
   }
 
   void removeTodo(int index) {
@@ -170,8 +170,14 @@ class PlannerProvider with ChangeNotifier {
     _data = PlannerData(
       priorities: [
         PriorityEntry(id: createPlannerId('prior'), text: '수학 기출 2회분 오답까지 끝내기'),
-        PriorityEntry(id: createPlannerId('prior'), text: '영어 지문 12개 분석하고 단어 정리'),
-        PriorityEntry(id: createPlannerId('prior'), text: '오늘 배운 개념 20분 안에 백지 복습'),
+        PriorityEntry(
+          id: createPlannerId('prior'),
+          text: '영어 지문 12개 분석하고 단어 정리',
+        ),
+        PriorityEntry(
+          id: createPlannerId('prior'),
+          text: '오늘 배운 개념 20분 안에 백지 복습',
+        ),
       ],
       timeBlocks: [
         TimeBlock(

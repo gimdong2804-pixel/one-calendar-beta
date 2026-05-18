@@ -23,6 +23,7 @@ class PlannerScreen extends StatelessWidget {
         final isCompact = constraints.maxWidth < 780;
         final planner = context.watch<PlannerProvider>();
         final topInset = MediaQuery.paddingOf(context).top;
+        final isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
         return Scaffold(
           body: Stack(
@@ -33,9 +34,9 @@ class PlannerScreen extends StatelessWidget {
                   child: SingleChildScrollView(
                     padding: EdgeInsets.fromLTRB(
                       isCompact ? 14 : 20,
-                      isCompact ? topInset + 104 : 40,
+                      isCompact ? topInset + (isKeyboardOpen ? 20 : 104) : 40,
                       isCompact ? 14 : 20,
-                      158,
+                      isKeyboardOpen ? 24 : 158,
                     ),
                     child: Center(
                       child: ConstrainedBox(
@@ -62,18 +63,39 @@ class PlannerScreen extends StatelessWidget {
                 Positioned(
                   top: topInset + 12,
                   left: 12,
-                  child: const _MobileDateDock(),
+                  child: IgnorePointer(
+                    ignoring: isKeyboardOpen,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 180),
+                      opacity: isKeyboardOpen ? 0 : 1,
+                      child: const _MobileDateDock(),
+                    ),
+                  ),
                 ),
               Positioned(
                 top: isCompact ? topInset + 12 : 20,
                 right: isCompact ? 18 : 24,
-                child: _FloatingControls(isCompact: isCompact),
+                child: IgnorePointer(
+                  ignoring: isKeyboardOpen,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 180),
+                    opacity: isKeyboardOpen ? 0 : 1,
+                    child: _FloatingControls(isCompact: isCompact),
+                  ),
+                ),
               ),
-              const Positioned(
+              Positioned(
                 left: 12,
                 right: 12,
                 bottom: 16,
-                child: _ActionBar(),
+                child: IgnorePointer(
+                  ignoring: isKeyboardOpen,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 180),
+                    opacity: isKeyboardOpen ? 0 : 1,
+                    child: const _ActionBar(),
+                  ),
+                ),
               ),
             ],
           ),
@@ -253,35 +275,6 @@ class _MobileDateDock extends StatelessWidget {
   }
 }
 
-class _GradientGlyph extends StatelessWidget {
-  const _GradientGlyph({required this.child, this.size = 24});
-
-  final Widget child;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return ShaderMask(
-      shaderCallback: (bounds) => LinearGradient(
-        colors: [
-          Theme.of(context).colorScheme.primary,
-          Theme.of(context).colorScheme.secondary,
-        ],
-      ).createShader(bounds),
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: IconTheme.merge(
-          data: IconThemeData(size: size, color: Colors.white),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
-
-
 class _ClampedCurve extends Curve {
   const _ClampedCurve(this.curve);
   final Curve curve;
@@ -291,7 +284,6 @@ class _ClampedCurve extends Curve {
     return curve.transform(t).clamp(0.0, 1.0);
   }
 }
-
 
 class _FloatingControls extends StatelessWidget {
   const _FloatingControls({required this.isCompact});
@@ -327,7 +319,7 @@ class _FloatingControls extends StatelessWidget {
         ),
         SizedBox(width: isCompact ? 10 : 14),
         _FloatingIconButton(
-          glyph: const Icon(Icons.settings_outlined),
+          glyph: const AnimatedSettingsIcon(),
           tooltip: '환경 설정',
           compact: isCompact,
           breatheDelay: Duration.zero,
@@ -348,7 +340,7 @@ class PrioritiesCard extends StatelessWidget {
     final isTodoPanel = planner.activePanel == PlannerPanel.todos;
     final title = isTodoPanel
         ? '할 일 목록'
-        : '오늘의 핵심 목표 (Top ${planner.data.priorities.length})';
+        : '나의 핵심 목표 (Top ${planner.data.priorities.length})';
     final subtitle = isTodoPanel
         ? '굵게 강조, 여러 날짜 복사까지 한 번에 관리하세요.'
         : '오늘 반드시 해결할 핵심 목표를 먼저 정리해보세요.';
@@ -471,9 +463,7 @@ class _ModeToggleButton extends StatelessWidget {
       ),
     );
 
-    return fullWidth
-        ? SizedBox(width: double.infinity, child: button)
-        : button;
+    return fullWidth ? SizedBox(width: double.infinity, child: button) : button;
   }
 }
 
@@ -546,18 +536,18 @@ class _PriorityRowState extends State<PriorityRow>
       vsync: this,
       duration: _springPopDuration,
     );
-    _scaleAnim = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: _springPopCurve),
-    );
-    _opacityAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _scaleAnim = Tween<double>(
+      begin: 0.9,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: _springPopCurve));
+    _opacityAnim = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _slideAnim = Tween<Offset>(
       begin: const Offset(0, 0.08),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: _springPopCurve),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: _springPopCurve));
     _controller.forward();
   }
 
@@ -588,10 +578,7 @@ class _PriorityRowState extends State<PriorityRow>
           position: _slideAnim,
           child: FadeTransition(
             opacity: _opacityAnim,
-            child: ScaleTransition(
-              scale: _scaleAnim,
-              child: child,
-            ),
+            child: ScaleTransition(scale: _scaleAnim, child: child),
           ),
         );
       },
@@ -603,9 +590,8 @@ class _PriorityRowState extends State<PriorityRow>
                 value: widget.entry.text,
                 onChanged: (next) =>
                     provider.updatePriority(widget.index, next),
-                onDelete: () => _animateOut(
-                  () => provider.removePriority(widget.index),
-                ),
+                onDelete: () =>
+                    _animateOut(() => provider.removePriority(widget.index)),
               ),
             )
           : Padding(
@@ -639,10 +625,9 @@ class _PriorityRowState extends State<PriorityRow>
                         minLines: 1,
                         maxLines: 3,
                         textInputAction: TextInputAction.newline,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(fontWeight: FontWeight.w700),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                         decoration: const InputDecoration(
                           hintText: '반드시 해결해야 할 최우선 과제 (Top 3)',
                         ),
@@ -824,83 +809,147 @@ class TodoPanel extends StatelessWidget {
   }
 }
 
-class TodoRow extends StatelessWidget {
+class TodoRow extends StatefulWidget {
   const TodoRow({super.key, required this.index, required this.todo});
 
   final int index;
   final TodoEntry todo;
 
   @override
+  State<TodoRow> createState() => _TodoRowState();
+}
+
+class _TodoRowState extends State<TodoRow> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnim;
+  late final Animation<double> _opacityAnim;
+  late final Animation<Offset> _slideAnim;
+  bool _isExiting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: _springPopDuration,
+    );
+    _scaleAnim = Tween<double>(
+      begin: 0.9,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: _springPopCurve));
+    _opacityAnim = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: _springPopCurve));
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _animateOut(VoidCallback onComplete) {
+    if (_isExiting) return;
+    setState(() => _isExiting = true);
+    _controller.duration = _popOutDuration;
+    _controller.reverse().then((_) {
+      if (mounted) onComplete();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = context.read<PlannerProvider>();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: context.borderSubtle),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Checkbox(
-                    value: todo.selected,
-                    shape: const CircleBorder(),
-                    onChanged: (value) =>
-                        provider.toggleTodoSelection(index, value ?? false),
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                      initialValue: todo.title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                      decoration: const InputDecoration(hintText: '할 일 제목'),
-                      onChanged: (value) =>
-                          provider.updateTodo(index, title: value),
-                    ),
-                  ),
-                  _InlineDeleteButton(
-                    onPressed: () => provider.removeTodo(index),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: context.softInput,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: context.borderSubtle),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  child: TextFormField(
-                    initialValue: todo.note,
-                    minLines: 3,
-                    maxLines: 8,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    decoration: const InputDecoration(
-                      hintText: '세부 내용을 적어두세요.',
-                    ),
-                    onChanged: (value) =>
-                        provider.updateTodo(index, note: value),
-                  ),
-                ),
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return SlideTransition(
+          position: _slideAnim,
+          child: FadeTransition(
+            opacity: _opacityAnim,
+            child: ScaleTransition(scale: _scaleAnim, child: child),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: context.borderSubtle),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
               ),
             ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Checkbox(
+                      value: widget.todo.selected,
+                      shape: const CircleBorder(),
+                      onChanged: (value) => provider.toggleTodoSelection(
+                        widget.index,
+                        value ?? false,
+                      ),
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: widget.todo.title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                        decoration: const InputDecoration(hintText: '할 일 제목'),
+                        onChanged: (value) =>
+                            provider.updateTodo(widget.index, title: value),
+                      ),
+                    ),
+                    _InlineDeleteButton(
+                      onPressed: () =>
+                          _animateOut(() => provider.removeTodo(widget.index)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: context.softInput,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: context.borderSubtle),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    child: TextFormField(
+                      initialValue: widget.todo.note,
+                      minLines: 3,
+                      maxLines: 8,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      decoration: const InputDecoration(
+                        hintText: '세부 내용을 적어두세요.',
+                      ),
+                      onChanged: (value) =>
+                          provider.updateTodo(widget.index, note: value),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -992,18 +1041,18 @@ class _TimeBlockRowState extends State<TimeBlockRow>
       vsync: this,
       duration: _springPopDuration,
     );
-    _scaleAnim = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: _springPopCurve),
-    );
-    _opacityAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _scaleAnim = Tween<double>(
+      begin: 0.9,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: _springPopCurve));
+    _opacityAnim = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _slideAnim = Tween<Offset>(
       begin: const Offset(0, 0.08),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: _springPopCurve),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: _springPopCurve));
     _controller.forward();
   }
 
@@ -1047,12 +1096,10 @@ class _TimeBlockRowState extends State<TimeBlockRow>
         initialValue: widget.block.text,
         minLines: 1,
         maxLines: 4,
-        style: Theme.of(context)
-            .textTheme
-            .bodyLarge
-            ?.copyWith(fontWeight: FontWeight.w700),
-        decoration:
-            const InputDecoration(hintText: '해당 시간에 무엇을 할 계획인가요?'),
+        style: Theme.of(
+          context,
+        ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+        decoration: const InputDecoration(hintText: '해당 시간에 무엇을 할 계획인가요?'),
         onChanged: (value) =>
             provider.updateTimeBlock(widget.index, text: value),
       ),
@@ -1065,58 +1112,26 @@ class _TimeBlockRowState extends State<TimeBlockRow>
           position: _slideAnim,
           child: FadeTransition(
             opacity: _opacityAnim,
-            child: ScaleTransition(
-              scale: _scaleAnim,
-              child: child,
-            ),
+            child: ScaleTransition(scale: _scaleAnim, child: child),
           ),
         );
       },
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: _InputPill(
-          child: compact
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        ReorderableDragStartListener(
-                          index: widget.index,
-                          child: Icon(
-                            Icons.drag_indicator_rounded,
-                            color: context.mutedText,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(child: timeField),
-                        _InlineDeleteButton(
-                          onPressed: () => _animateOut(
-                            () => provider.removeTimeBlock(widget.index),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      initialValue: widget.block.text,
-                      minLines: 1,
-                      maxLines: 4,
-                      style:
-                          Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                      decoration: const InputDecoration(
-                        hintText: '해당 시간에 무엇을 할 계획인가요?',
-                      ),
-                      onChanged: (value) => provider.updateTimeBlock(
-                        widget.index,
-                        text: value,
-                      ),
-                    ),
-                  ],
-                )
-              : Row(
+        child: compact
+            ? _TimeBlockMobileCard(
+                index: widget.index,
+                time: widget.block.time,
+                text: widget.block.text,
+                onTimeChanged: (value) =>
+                    provider.updateTimeBlock(widget.index, time: value),
+                onTextChanged: (value) =>
+                    provider.updateTimeBlock(widget.index, text: value),
+                onDelete: () =>
+                    _animateOut(() => provider.removeTimeBlock(widget.index)),
+              )
+            : _InputPill(
+                child: Row(
                   children: [
                     ReorderableDragStartListener(
                       index: widget.index,
@@ -1136,6 +1151,110 @@ class _TimeBlockRowState extends State<TimeBlockRow>
                     ),
                   ],
                 ),
+              ),
+      ),
+    );
+  }
+}
+
+class _TimeBlockMobileCard extends StatelessWidget {
+  const _TimeBlockMobileCard({
+    required this.index,
+    required this.time,
+    required this.text,
+    required this.onTimeChanged,
+    required this.onTextChanged,
+    required this.onDelete,
+  });
+
+  final int index;
+  final String time;
+  final String text;
+  final ValueChanged<String> onTimeChanged;
+  final ValueChanged<String> onTextChanged;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: context.borderSubtle),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 118),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  ReorderableDragStartListener(
+                    index: index,
+                    child: Icon(
+                      Icons.drag_indicator_rounded,
+                      color: context.mutedText,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextFormField(
+                      initialValue: time,
+                      maxLines: 1,
+                      textInputAction: TextInputAction.next,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                        fontWeight: FontWeight.w900,
+                      ),
+                      decoration: const InputDecoration(
+                        hintText: '예: 07:30 - 08:00',
+                      ),
+                      onChanged: onTimeChanged,
+                    ),
+                  ),
+                  _InlineDeleteButton(onPressed: onDelete),
+                ],
+              ),
+              const SizedBox(height: 8),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: context.softInput,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: context.borderSubtle),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  child: TextFormField(
+                    initialValue: text,
+                    minLines: 1,
+                    maxLines: 3,
+                    textInputAction: TextInputAction.newline,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                    decoration: const InputDecoration(
+                      hintText: '해당 시간에 무엇을 할 계획인가요?',
+                    ),
+                    onChanged: onTextChanged,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1708,6 +1827,7 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
   late final Animation<double> _breatheAnim;
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnim;
+  Timer? _breatheDelayTimer;
 
   @override
   void initState() {
@@ -1718,34 +1838,39 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
       duration: const Duration(milliseconds: 3000),
     );
     _breatheAnim = Tween<double>(begin: 1.0, end: 1.03).animate(
-      CurvedAnimation(parent: _breatheController, curve: const _ClampedCurve(Curves.easeInOut)),
+      CurvedAnimation(
+        parent: _breatheController,
+        curve: const _ClampedCurve(Curves.easeInOut),
+      ),
     );
-    
+
     // Bounce animation on tap: scale 1 -> 0.85 -> 1.15 -> 0.95 -> 1
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    _bounceAnim = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.85), weight: 30),
-      TweenSequenceItem(tween: Tween(begin: 0.85, end: 1.15), weight: 30),
-      TweenSequenceItem(tween: Tween(begin: 1.15, end: 0.95), weight: 20),
-      TweenSequenceItem(tween: Tween(begin: 0.95, end: 1.0), weight: 20),
-    ]).animate(
-      CurvedAnimation(
-        parent: _bounceController,
-        curve: const _ClampedCurve(Curves.easeInOut),
-      ),
-    );
+    _bounceAnim =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.85), weight: 30),
+          TweenSequenceItem(tween: Tween(begin: 0.85, end: 1.15), weight: 30),
+          TweenSequenceItem(tween: Tween(begin: 1.15, end: 0.95), weight: 20),
+          TweenSequenceItem(tween: Tween(begin: 0.95, end: 1.0), weight: 20),
+        ]).animate(
+          CurvedAnimation(
+            parent: _bounceController,
+            curve: const _ClampedCurve(Curves.easeInOut),
+          ),
+        );
 
     // Start with delay for staggered effect
-    Future.delayed(widget.breatheDelay, () {
+    _breatheDelayTimer = Timer(widget.breatheDelay, () {
       if (mounted) _breatheController.repeat(reverse: true);
     });
   }
 
   @override
   void dispose() {
+    _breatheDelayTimer?.cancel();
     _breatheController.dispose();
     _bounceController.dispose();
     super.dispose();
@@ -1774,10 +1899,7 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
         : Colors.black.withValues(alpha: 0.05);
 
     final buttonBody = AnimatedBuilder(
-      animation: Listenable.merge([
-        _breatheController,
-        _bounceController,
-      ]),
+      animation: Listenable.merge([_breatheController, _bounceController]),
       builder: (context, child) {
         final breatheScale = _breatheAnim.value;
         final bounceScale = _bounceAnim.value;
@@ -1812,14 +1934,9 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
                       decoration: BoxDecoration(
                         color: bgColor,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: borderColor, 
-                          width: 1.5
-                        ),
+                        border: Border.all(color: borderColor, width: 1.5),
                       ),
-                      child: Center(
-                        child: widget.glyph,
-                      ),
+                      child: Center(child: widget.glyph),
                     ),
                   ),
                 ),

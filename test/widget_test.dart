@@ -18,9 +18,10 @@ void main() {
         child: const OneCalendarApp(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.textContaining('오늘의 핵심 목표'), findsOneWidget);
+    expect(find.textContaining('나의 핵심 목표'), findsOneWidget);
     expect(find.textContaining('타임 블로킹'), findsOneWidget);
   });
 }

@@ -82,12 +82,15 @@ class PlannerData {
     }
 
     return PlannerData(
-      priorities: prioritiesStrings.isEmpty ||
+      priorities:
+          prioritiesStrings.isEmpty ||
               prioritiesStrings.every((item) => item.trim().isEmpty)
           ? [PriorityEntry(id: createPlannerId('prior'), text: '')]
           : prioritiesStrings
-              .map((s) => PriorityEntry(id: createPlannerId('prior'), text: s))
-              .toList(growable: true),
+                .map(
+                  (s) => PriorityEntry(id: createPlannerId('prior'), text: s),
+                )
+                .toList(growable: true),
       timeBlocks: timeBlocks.isEmpty
           ? PlannerData.defaults().timeBlocks
           : timeBlocks,
@@ -161,7 +164,12 @@ class TodoEntry {
     );
   }
 
-  Map<String, dynamic> toJson() => {'id': id, 'title': title, 'note': note};
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'note': note,
+    'selected': selected,
+  };
 }
 
 class PomodoroTask {
@@ -232,4 +240,3 @@ class PriorityEntry {
   final String id;
   String text;
 }
-

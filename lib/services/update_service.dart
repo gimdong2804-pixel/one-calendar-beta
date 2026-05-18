@@ -7,8 +7,8 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// 현재 앱의 빌드 번호 (pubspec.yaml의 +N 부분과 일치시켜야 함)
-const int currentBuildNumber = 20;
-const String currentVersionName = 'One UI 1.0 (Beta 20)';
+const int currentBuildNumber = 21;
+const String currentVersionName = 'One UI 1.0 (Beta 21)';
 
 /// GitHub raw URL에서 update_info.json 읽기
 const String _updateInfoUrl =
@@ -46,7 +46,9 @@ class UpdateService {
       final client = HttpClient();
       client.connectionTimeout = const Duration(seconds: 5);
       final request = await client.getUrl(Uri.parse(_updateInfoUrl));
-      final response = await request.close().timeout(const Duration(seconds: 5));
+      final response = await request.close().timeout(
+        const Duration(seconds: 5),
+      );
 
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
@@ -124,7 +126,11 @@ class UpdateService {
     showDialog(
       context: rootContext,
       builder: (_) => AlertDialog(
-        icon: const Icon(Icons.system_update, color: Color(0xFF4F46E5), size: 48),
+        icon: const Icon(
+          Icons.system_update,
+          color: Color(0xFF4F46E5),
+          size: 48,
+        ),
         title: const Text('새 업데이트가 있습니다!'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -135,7 +141,10 @@ class UpdateService {
             _UpdateRow(label: '최신 버전', value: info.versionName),
             if (info.changelog.isNotEmpty) ...[
               const SizedBox(height: 16),
-              const Text('변경 사항:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                '변경 사항:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 4),
               Text(info.changelog),
             ],
@@ -149,7 +158,11 @@ class UpdateService {
           FilledButton.icon(
             onPressed: () {
               Navigator.of(rootContext).pop();
-              _downloadAndInstall(rootContext, info.downloadUrl, info.versionName);
+              _downloadAndInstall(
+                rootContext,
+                info.downloadUrl,
+                info.versionName,
+              );
             },
             icon: const Icon(Icons.download),
             label: const Text('업데이트'),
@@ -180,7 +193,11 @@ class UpdateService {
       builder: (_) => PopScope(
         canPop: false,
         child: AlertDialog(
-          icon: const Icon(Icons.downloading, color: Color(0xFF4F46E5), size: 40),
+          icon: const Icon(
+            Icons.downloading,
+            color: Color(0xFF4F46E5),
+            size: 40,
+          ),
           title: const Text('업데이트 다운로드 중'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -258,7 +275,10 @@ class UpdateService {
       }
 
       // APK 설치 화면 열기
-      final result = await OpenFilex.open(filePath, type: 'application/vnd.android.package-archive');
+      final result = await OpenFilex.open(
+        filePath,
+        type: 'application/vnd.android.package-archive',
+      );
 
       if (result.type != ResultType.done) {
         if (!rootContext.mounted) return;
