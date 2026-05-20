@@ -67,6 +67,7 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
       child: Scaffold(
         backgroundColor: bgColor,
         appBar: AppBar(
+          systemOverlayStyle: systemOverlay,
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,

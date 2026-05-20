@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 25,
-  "versionName": "One UI 1.0 (Beta 25)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta25.apk",
-  "changelog": "소프트웨어 업데이트 화면 진입 버벅임 완전 최적화(120fps) 적용 및 라이트 모드 상태바 검은색 고정 시인성 오류 수정"
+  "latestBuildNumber": 26,
+  "versionName": "One UI 1.0 (Beta 26)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta26.apk",
+  "changelog": "라이트 모드 상태바 아이콘 색상(검은색) 시인성 오류 완벽 해결 및 진입 버벅임(120fps) 개선 적용"
 }
