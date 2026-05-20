@@ -7,8 +7,8 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// 현재 앱의 빌드 번호 (pubspec.yaml의 +N 부분과 일치시켜야 함)
-const int currentBuildNumber = 24;
-const String currentVersionName = 'One UI 1.0 (Beta 24)';
+const int currentBuildNumber = 25;
+const String currentVersionName = 'One UI 1.0 (Beta 25)';
 
 /// GitHub raw URL에서 update_info.json 읽기
 const String _updateInfoUrl =
@@ -45,7 +45,10 @@ class UpdateService {
     try {
       final client = HttpClient();
       client.connectionTimeout = const Duration(seconds: 5);
-      final request = await client.getUrl(Uri.parse(_updateInfoUrl));
+      
+      // 캐시 방지를 위해 타임스탬프 쿼리 매개변수 추가 (GitHub CDN 및 로컬 디바이스 캐시 우회)
+      final preventCacheUrl = '$_updateInfoUrl?t=${DateTime.now().millisecondsSinceEpoch}';
+      final request = await client.getUrl(Uri.parse(preventCacheUrl));
       final response = await request.close().timeout(
         const Duration(seconds: 5),
       );
