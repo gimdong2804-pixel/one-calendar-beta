@@ -7,8 +7,8 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// 현재 앱의 빌드 번호 (pubspec.yaml의 +N 부분과 일치시켜야 함)
-const int currentBuildNumber = 27;
-const String currentVersionName = 'One UI 1.0 (Beta 27)';
+const int currentBuildNumber = 28;
+const String currentVersionName = 'One UI 1.0 (Beta 28)';
 
 /// GitHub raw URL에서 update_info.json 읽기
 const String _updateInfoUrl =
@@ -312,6 +312,60 @@ class UpdateService {
     } finally {
       progress.dispose();
       statusText.dispose();
+    }
+  }
+
+  /// APK를 인앱으로 다운로드하고 진행률을 콜백으로 전달하며 완료 시 자동으로 설치 화면을 띄움
+  static Future<void> downloadAndInstallWithCallback({
+    required BuildContext context,
+    required String url,
+    required String versionName,
+    required void Function(double progress, String statusText) onProgress,
+    required void Function(String error) onError,
+    required void Function() onComplete,
+  }) async {
+    try {
+      // 캐시 디렉토리에 APK 저장
+      final dir = await getTemporaryDirectory();
+      final filePath = '${dir.path}/OneCalendar-update.apk';
+
+      // 기존 파일이 있으면 삭제
+      final file = File(filePath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+
+      onProgress(0.0, '다운로드 준비 중...');
+
+      final dio = Dio();
+      await dio.download(
+        url,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total > 0) {
+            final val = received / total;
+            final receivedMB = (received / 1024 / 1024).toStringAsFixed(1);
+            final totalMB = (total / 1024 / 1024).toStringAsFixed(1);
+            onProgress(val, '$receivedMB MB / $totalMB MB');
+          }
+        },
+      );
+
+      // 다운로드 완료
+      onProgress(1.0, '설치 준비 중...');
+      onComplete();
+
+      // APK 설치 화면 열기
+      final result = await OpenFilex.open(
+        filePath,
+        type: 'application/vnd.android.package-archive',
+      );
+
+      if (result.type != ResultType.done) {
+        onError('설치를 열 수 없습니다: ${result.message}');
+      }
+    } catch (e) {
+      onError('다운로드 실패: $e');
     }
   }
 }

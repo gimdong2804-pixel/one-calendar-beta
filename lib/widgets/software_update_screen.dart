@@ -306,7 +306,7 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'One UI 8.5',
+                            'One UI 1.0',
                             style: TextStyle(
                               color: textColor,
                               fontSize: 42,
@@ -335,7 +335,7 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                               duration: const Duration(milliseconds: 600),
                               curve: Curves.easeOutCubic,
                               child: Padding(
-                                padding: const EdgeInsets.only(top: 12),
+                                padding: const EdgeInsets.only(top: 4),
                                 child: Text(
                                   '최신 소프트웨어입니다.',
                                   style: TextStyle(
@@ -400,7 +400,7 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                                 shape: const StadiumBorder(), // Perfectly rounded pill shape
                               ),
                               child: _updateState == UpdateState.checking
-                                  ? const OneUILoadingDots()
+                                  ? const OneUIRotatingDots()
                                   : const Text(
                                       '업데이트 확인',
                                       style: TextStyle(
@@ -425,21 +425,21 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
   }
 }
 
-/// Dynamic bouncing dot loading animation for One UI aesthetics
-class OneUILoadingDots extends StatefulWidget {
-  const OneUILoadingDots({super.key});
+/// Premium 4-dot circular rotating loader for One UI 1.0
+class OneUIRotatingDots extends StatefulWidget {
+  const OneUIRotatingDots({super.key});
 
   @override
-  State<OneUILoadingDots> createState() => _OneUILoadingDotsState();
+  State<OneUIRotatingDots> createState() => _OneUIRotatingDotsState();
 }
 
-class _OneUILoadingDotsState extends State<OneUILoadingDots> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _OneUIRotatingDotsState extends State<OneUIRotatingDots> with SingleTickerProviderStateMixin {
+  late AnimationController _rotationController;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _rotationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat();
@@ -447,48 +447,55 @@ class _OneUILoadingDotsState extends State<OneUILoadingDots> with SingleTickerPr
 
   @override
   void dispose() {
-    _controller.dispose();
+    _rotationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(4, (index) {
-        return AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            // Distribute animation start delays for wave simulation
-            final double delay = index * 0.15;
-            final double progress = (_controller.value - delay) % 1.0;
-            
-            // Generate clean wave displacement using smooth sine curves
-            final double dy = -6.0 * (progress < 0.5 ? (1.0 - (progress * 2.0 - 0.5).abs()) : 0.0);
-            
-            // Subtly scale concurrently to replicate dynamic UI aesthetics
-            final double scale = 1.0 + 0.2 * (progress < 0.5 ? (1.0 - (progress * 2.0 - 0.5).abs()) : 0.0);
-
-            return Transform.translate(
-              offset: Offset(0, dy),
-              child: Transform.scale(
-                scale: scale,
-                child: child,
-              ),
-            );
-          },
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 5),
-            width: 7,
-            height: 7,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
+    return RotationTransition(
+      turns: _rotationController,
+      child: SizedBox(
+        width: 24,
+        height: 24,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Top Dot
+            Positioned(
+              top: 0,
+              child: _buildDot(),
             ),
-          ),
-        );
-      }),
+            // Bottom Dot
+            Positioned(
+              bottom: 0,
+              child: _buildDot(),
+            ),
+            // Left Dot
+            Positioned(
+              left: 0,
+              child: _buildDot(),
+            ),
+            // Right Dot
+            Positioned(
+              right: 0,
+              child: _buildDot(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDot() {
+    return Container(
+      width: 6,
+      height: 6,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
     );
   }
 }
+
