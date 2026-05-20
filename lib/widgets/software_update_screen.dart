@@ -65,9 +65,9 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
       // Simulate has update
       final demoInfo = UpdateInfo(
         latestBuildNumber: currentBuildNumber + 1,
-        versionName: 'One UI 8.5 (Official)',
-        downloadUrl: 'https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta27.apk',
-        changelog: '★ One UI 8.5 공식 정식 빌드 출시! ★\n\n1. 고급 아크릴 블러 이중 오버레이 카드 뷰 탑재\n2. 3D 시네마틱 구체 월페이퍼 디자인 가미\n3. 120Hz 초고주사율 렌더링 최적화 설계\n4. 안드로이드 상태바 검정/하얀 하이브리드 색상 완벽 자동 동기화 기술 적용',
+        versionName: 'One UI 1.0 (Beta 28)',
+        downloadUrl: 'https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta28.apk',
+        changelog: '★ One UI 1.0 (Beta 28) 업데이트 대규모 개편! ★\n\n1. 프리미엄 4-도트 원형 회전 로딩 애니메이션\n2. 끌어서 화면을 채우는 슬라이딩 스냅 시트 카드\n3. 완벽한 밝은 화면(라이트 모드) 컬러 자동 대응\n4. 버튼 자체에 내장된 실시간 진행률 애니메이션 인라인 게이지 바',
       );
       setState(() {
         _updateState = UpdateState.hasUpdate;
