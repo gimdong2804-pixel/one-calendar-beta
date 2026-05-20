@@ -1,0 +1,12 @@
+# One UI 1.0 (Beta 31) Release
+
+## 변경 사항
+- **백그라운드 업데이트 확인 서비스 완전 제거 (`flutter_background_service`)**:
+  - 백그라운드 엔진 구동 시의 메모리 크래시 및 안드로이드 시스템과의 호환성 문제(Isolate 바인딩, 알림 플러그인 누락 등)를 근본적으로 해소하기 위해, 문제가 되었던 백그라운드 확인 서비스(`flutter_background_service`) 및 연관 라이브러리(`flutter_local_notifications`, `connectivity_plus`)를 프로젝트에서 완벽하게 제거하였습니다.
+- **앱의 비정상 종료(크래시) 현상 완벽 해결**:
+  - 이로써 앱 실행 즉시 크래시와 함께 강제 종료되는 현상이 완전히 조치되었으며, One Calendar 본연의 기능과 설정 화면을 안정적으로 정상 사용할 수 있습니다.
+  - 앱 내의 소프트웨어 업데이트 기능은 수동 방식("업데이트 확인" 버튼 터치 시 쾌속 조회)으로 안전하게 우회 가동됩니다.
+
+## 파일 정보
+- **파일명:** one-calendar-one-ui-1.0-beta-31.apk
+- **SHA256 Checksum:** 358A5A1B69EB839BD82865B7137F258319DD56116CFCD29C798F61D2298FB13E
