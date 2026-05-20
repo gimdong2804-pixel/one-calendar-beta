@@ -7,8 +7,8 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// 현재 앱의 빌드 번호 (pubspec.yaml의 +N 부분과 일치시켜야 함)
-const int currentBuildNumber = 26;
-const String currentVersionName = 'One UI 1.0 (Beta 26)';
+const int currentBuildNumber = 27;
+const String currentVersionName = 'One UI 1.0 (Beta 27)';
 
 /// GitHub raw URL에서 update_info.json 읽기
 const String _updateInfoUrl =
@@ -161,7 +161,7 @@ class UpdateService {
           FilledButton.icon(
             onPressed: () {
               Navigator.of(rootContext).pop();
-              _downloadAndInstall(
+              downloadAndInstall(
                 rootContext,
                 info.downloadUrl,
                 info.versionName,
@@ -176,7 +176,7 @@ class UpdateService {
   }
 
   /// APK를 인앱으로 다운로드하고 자동으로 설치 화면을 띄움
-  static Future<void> _downloadAndInstall(
+  static Future<void> downloadAndInstall(
     BuildContext context,
     String url,
     String versionName,
