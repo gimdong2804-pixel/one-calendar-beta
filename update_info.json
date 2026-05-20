@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 29,
-  "versionName": "One UI 1.0 (Beta 29)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta29.apk",
-  "changelog": "One UI 1.0 (Beta 29) 업데이트 완료! 실시간 백그라운드 자동 업데이트 체크(1분 주기) 및 모바일 네이티브 시스템 알림창 알림 기능 도입. 인터넷 연결 미감지 시 생략 로직 탑재."
+  "latestBuildNumber": 30,
+  "versionName": "One UI 1.0 (Beta 30)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta30.apk",
+  "changelog": "One UI 1.0 (Beta 30) 업데이트 완료! 백그라운드 실시간 업데이트 감지 서비스의 Isolate 바인딩 초기화 에러(크래시) 원천 해결 및 전반적인 구동 안정성 강화."
 }
