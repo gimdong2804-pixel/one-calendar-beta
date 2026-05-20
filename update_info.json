@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 28,
-  "versionName": "One UI 1.0 (Beta 28)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta28.apk",
-  "changelog": "One UI 1.0 회전 로딩 애니메이션 최적화, 최신 상태 문구 정렬 상향, 드래그 핸들 접기 제스처 카드 스크롤, 실시간 인라인 다운로드 버튼 진행 표시줄 및 밝은 테마 완벽 통합 완료"
+  "latestBuildNumber": 29,
+  "versionName": "One UI 1.0 (Beta 29)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta29.apk",
+  "changelog": "One UI 1.0 (Beta 29) 업데이트 완료! 실시간 백그라운드 자동 업데이트 체크(1분 주기) 및 모바일 네이티브 시스템 알림창 알림 기능 도입. 인터넷 연결 미감지 시 생략 로직 탑재."
 }

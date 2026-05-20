@@ -10,11 +10,21 @@ import 'package:window_manager/window_manager.dart';
 
 import 'providers/planner_provider.dart';
 import 'providers/settings_provider.dart';
+import 'services/background_update_service.dart';
 import 'theme.dart';
 import 'widgets/planner_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Android/iOS 환경에서 백그라운드 업데이트 확인 서비스 시작
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    try {
+      await BackgroundUpdateService.initialize();
+    } catch (e) {
+      debugPrint('백그라운드 업데이트 서비스 초기화 실패: $e');
+    }
+  }
 
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     await windowManager.ensureInitialized();

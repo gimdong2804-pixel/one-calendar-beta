@@ -51,7 +51,7 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
   }
 
   /// Perform actual update check with premium loader transition
-  Future<void> _handleUpdateCheck({bool forceUpdateDemo = false, bool forceNoUpdateDemo = false}) async {
+  Future<void> _handleUpdateCheck() async {
     if (_updateState == UpdateState.checking) return;
 
     setState(() {
@@ -60,30 +60,6 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
 
     // Elegant delays to allow the luxurious dot loading animations to play naturally (approx 1.8 seconds)
     await Future.delayed(const Duration(milliseconds: 1800));
-
-    if (forceUpdateDemo) {
-      // Simulate has update
-      final demoInfo = UpdateInfo(
-        latestBuildNumber: currentBuildNumber + 1,
-        versionName: 'One UI 1.0 (Beta 28)',
-        downloadUrl: 'https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta28.apk',
-        changelog: '★ One UI 1.0 (Beta 28) 업데이트 대규모 개편! ★\n\n1. 프리미엄 4-도트 원형 회전 로딩 애니메이션\n2. 끌어서 화면을 채우는 슬라이딩 스냅 시트 카드\n3. 완벽한 밝은 화면(라이트 모드) 컬러 자동 대응\n4. 버튼 자체에 내장된 실시간 진행률 애니메이션 인라인 게이지 바',
-      );
-      setState(() {
-        _updateState = UpdateState.hasUpdate;
-        _demoUpdateInfo = demoInfo;
-      });
-      _navigateToDetail(demoInfo);
-      return;
-    }
-
-    if (forceNoUpdateDemo) {
-      // Simulate no update
-      setState(() {
-        _updateState = UpdateState.upToDate;
-      });
-      return;
-    }
 
     // Standard live check
     final info = await UpdateService.checkForUpdate();
@@ -179,34 +155,19 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           actions: [
-            // Premium simulation menu to test both Update Found and Already Up-To-Date
-            PopupMenuButton<String>(
+            // Reserved for future features - currently shows a clean placeholder
+            IconButton(
               icon: Icon(Icons.more_vert_rounded, color: textColor),
-              onSelected: (value) {
-                if (value == 'demo_has_update') {
-                  _handleUpdateCheck(forceUpdateDemo: true);
-                } else if (value == 'demo_up_to_date') {
-                  _handleUpdateCheck(forceNoUpdateDemo: true);
-                } else if (value == 'reset') {
-                  setState(() {
-                    _updateState = UpdateState.idle;
-                  });
-                }
+              onPressed: () {
+                ScaffoldMessenger.of(context)
+                  ..clearSnackBars()
+                  ..showSnackBar(
+                    const SnackBar(
+                      content: Text('추후 기능이 제공될 예정입니다.'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
               },
-              itemBuilder: (BuildContext context) => [
-                const PopupMenuItem(
-                  value: 'demo_has_update',
-                  child: Text('데모: 업데이트 있음 시뮬레이션'),
-                ),
-                const PopupMenuItem(
-                  value: 'demo_up_to_date',
-                  child: Text('데모: 업데이트 없음 시뮬레이션'),
-                ),
-                const PopupMenuItem(
-                  value: 'reset',
-                  child: Text('상태 초기화'),
-                ),
-              ],
             ),
             const SizedBox(width: 8),
           ],
