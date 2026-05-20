@@ -1,4 +1,3 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../services/update_service.dart';
 
@@ -69,53 +68,66 @@ class SoftwareUpdateScreen extends StatelessWidget {
                   SizedBox(
                     width: 320,
                     height: 320,
-                    child: ClipOval(
-                      child: ImageFiltered(
-                        imageFilter: ui.ImageFilter.blur(sigmaX: 55, sigmaY: 55),
-                        child: Stack(
-                          children: [
-                            // Top-Right: Cyan Glow
-                            Positioned(
-                              top: 20,
-                              right: 20,
-                              child: Container(
-                                width: 140,
-                                height: 140,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFF00F2FE).withOpacity(isDark ? 0.35 : 0.25),
-                                ),
+                    child: Stack(
+                      children: [
+                        // Top-Right: Cyan Glow
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Container(
+                            width: 220,
+                            height: 220,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  const Color(0xFF00F2FE).withOpacity(isDark ? 0.38 : 0.28),
+                                  const Color(0xFF00F2FE).withOpacity(0.0),
+                                ],
+                                stops: const [0.0, 1.0],
                               ),
                             ),
-                            // Bottom-Left: Warm Amber/Orange Glow
-                            Positioned(
-                              bottom: 20,
-                              left: 20,
-                              child: Container(
-                                width: 150,
-                                height: 150,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFFFF8C00).withOpacity(isDark ? 0.35 : 0.22),
-                                ),
-                              ),
-                            ),
-                            // Center: Soft Purple/Teal Glow
-                            Positioned(
-                              top: 90,
-                              left: 90,
-                              child: Container(
-                                width: 140,
-                                height: 140,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFF8A2387).withOpacity(isDark ? 0.25 : 0.18),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        // Bottom-Left: Warm Amber/Orange Glow
+                        Positioned(
+                          bottom: 10,
+                          left: 10,
+                          child: Container(
+                            width: 230,
+                            height: 230,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  const Color(0xFFFF8C00).withOpacity(isDark ? 0.35 : 0.24),
+                                  const Color(0xFFFF8C00).withOpacity(0.0),
+                                ],
+                                stops: const [0.0, 1.0],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Center: Soft Purple Glow
+                        Positioned(
+                          top: 60,
+                          left: 60,
+                          child: Container(
+                            width: 200,
+                            height: 200,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  const Color(0xFF8A2387).withOpacity(isDark ? 0.30 : 0.20),
+                                  const Color(0xFF8A2387).withOpacity(0.0),
+                                ],
+                                stops: const [0.0, 1.0],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   
@@ -175,27 +187,29 @@ class SoftwareUpdateScreen extends StatelessWidget {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 24, left: 24, right: 24),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 60,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      UpdateService.checkAndShowDialog(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2A7DFC), // Samsung Premium Blue
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
-                      shape: const StadiumBorder(), // Perfectly rounded pill shape
-                    ),
-                    child: const Text(
-                      '업데이트 확인',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Center(
+                  child: SizedBox(
+                    width: 240, // Elegant narrowed width
+                    height: 56, // Perfect premium height
+                    child: ElevatedButton(
+                      onPressed: () {
+                        UpdateService.checkAndShowDialog(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2A7DFC), // Samsung Premium Blue
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                        shape: const StadiumBorder(), // Perfectly rounded pill shape
+                      ),
+                      child: const Text(
+                        '업데이트 확인',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                        ),
                       ),
                     ),
                   ),

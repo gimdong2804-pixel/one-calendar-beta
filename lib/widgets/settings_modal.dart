@@ -25,6 +25,14 @@ class SettingsScreen extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text('설정', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: ListView(

@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 23,
-  "versionName": "One UI 1.0 (Beta 23)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta23.apk",
-  "changelog": "One UI 8.5 컨셉 스타일의 소프트웨어 업데이트 설정 화면을 추가하고, 업데이트 확인 명칭을 소프트웨어 업데이트로 변경했습니다."
+  "latestBuildNumber": 24,
+  "versionName": "One UI 1.0 (Beta 24)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta24.apk",
+  "changelog": "소프트웨어 업데이트 화면 진입 시 버벅임 개선, 그라데이션 글로우 효과 최적화, 뒤로가기 버튼 스타일 통일, 하단 업데이트 확인 버튼 폭 슬림화 적용"
 }
