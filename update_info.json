@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 22,
-  "versionName": "One UI 1.0 (Beta 22)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta22.apk",
-  "changelog": "고정 release keystore로 서명 체계를 전환했습니다. Beta 20 이하에서 넘어오는 경우 기존 앱을 삭제한 뒤 새로 설치해야 하며, 이후 Beta 22부터는 같은 키로 업데이트됩니다."
+  "latestBuildNumber": 23,
+  "versionName": "One UI 1.0 (Beta 23)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta23.apk",
+  "changelog": "One UI 8.5 컨셉 스타일의 소프트웨어 업데이트 설정 화면을 추가하고, 업데이트 확인 명칭을 소프트웨어 업데이트로 변경했습니다."
 }

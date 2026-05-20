@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
 import '../services/update_service.dart';
+import 'software_update_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -129,10 +130,14 @@ class SettingsScreen extends StatelessWidget {
               _SettingTile(
                 icon: Icons.system_update_rounded,
                 iconColor: Colors.teal,
-                title: '업데이트 확인',
+                title: '소프트웨어 업데이트',
                 subtitle: '현재: $currentVersionName',
                 onTap: () {
-                  UpdateService.checkAndShowDialog(context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const SoftwareUpdateScreen(),
+                    ),
+                  );
                 },
               ),
             ],
