@@ -23,17 +23,10 @@ Future<bool> onStartBackground(ServiceInstance service) async {
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
-  DartPluginRegistrant.ensureInitialized(); // 백그라운드 Isolate 내 플러그인 바인딩 강제 활성화
-
-  // 백그라운드 Isolate 영역에서 알림 플러그인 초기화 처리
   try {
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidSettings);
-    await BackgroundUpdateService.notificationsPlugin.initialize(initSettings);
+    DartPluginRegistrant.ensureInitialized(); // 백그라운드 Isolate 내 플러그인 바인딩 강제 활성화
   } catch (e) {
-    debugPrint('[백그라운드 서비스] 알림 플러그인 독립 초기화 에러: $e');
+    debugPrint('[백그라운드 서비스] 플러그인 바인딩 초기화 에러: $e');
   }
 
   // 포그라운드 서비스 알림 채널 연동
@@ -53,7 +46,11 @@ void onStart(ServiceInstance service) async {
 
   // 1분 간격 주기적인 업데이트 확인 타이머 설정
   Timer.periodic(const Duration(minutes: 1), (timer) async {
-    await _performUpdateCheckFlow(service);
+    try {
+      await _performUpdateCheckFlow(service);
+    } catch (e) {
+      debugPrint('[백그라운드 서비스] 타이머 런타임 오류: $e');
+    }
   });
 }
 
@@ -63,7 +60,14 @@ Future<void> _performUpdateCheckFlow(ServiceInstance? service) async {
     debugPrint('[백그라운드 서비스] 1분 업데이트 체크 타이머 시작');
 
     // 1. 인터넷 연결 유무 파악 (없으면 즉시 중단하여 불필요 리소스 제거)
-    final connectivityResult = await Connectivity().checkConnectivity();
+    List<ConnectivityResult> connectivityResult = [];
+    try {
+      connectivityResult = await Connectivity().checkConnectivity();
+    } catch (e) {
+      debugPrint('[백그라운드 서비스] 인터넷 연결 상태 조회 실패: $e');
+      connectivityResult = [ConnectivityResult.wifi]; // 안전 장치: 조회 오류 시 진행 허용
+    }
+
     if (connectivityResult.contains(ConnectivityResult.none)) {
       debugPrint('[백그라운드 서비스] 인터넷 연결 없음. 조회를 스킵합니다.');
       return;

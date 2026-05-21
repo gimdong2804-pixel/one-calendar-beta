@@ -32,11 +32,9 @@ Future<void> main() async {
   }
 
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-    try {
-      await BackgroundUpdateService.initialize();
-    } catch (e) {
+    BackgroundUpdateService.initialize().catchError((e) {
       debugPrint('백그라운드 업데이트 서비스 초기화 실패: $e');
-    }
+    });
   }
 
   Intl.defaultLocale = 'ko_KR';

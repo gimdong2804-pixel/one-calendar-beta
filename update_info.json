@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 33,
-  "versionName": "One UI 1.0 (Beta 33)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2033)/One%20UI%201.0%20(Beta%2033).apk",
-  "changelog": "One UI 1.0 (Beta 33) 업데이트가 완료되었습니다!\n1. 소리 전체 설정을 끌 시 디바이스 터치 피드백음(터치음)이 완전 차단되도록 글로벌 음량 제어를 강화했습니다.\n2. 소리 설정 화면의 볼륨 슬라이더 영역에 자연스러운 열림/닫힘 및 페이드 애니메이션을 적용했습니다.\n3. 백그라운드 실시간 소프트웨어 업데이트 확인 시 알림이 수신되지 않던 백그라운드 서비스 활성화 오류를 개선했습니다."
+  "latestBuildNumber": 34,
+  "versionName": "One UI 1.0 (Beta 34)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2034)/One%20UI%201.0%20(Beta%2034).apk",
+  "changelog": "One UI 1.0 (Beta 34) 업데이트가 완료되었습니다!\n1. 앱 실행 시 백그라운드 업데이트 확인 서비스 초기화에 따른 기동 지연 및 런타임 강제 종료(Crash) 현상을 전면 해결했습니다.\n2. 백그라운드 Isolate 런타임 환경에서 플랫폼 네트워크 채널 연동으로 발생하던 백그라운드 서비스의 비정상 중단 오류를 예방 및 복구하여 전체 시스템의 동작 안정성을 대폭 보강했습니다."
 }
