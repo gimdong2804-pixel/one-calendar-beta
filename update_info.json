@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 31,
-  "versionName": "One UI 1.0 (Beta 31)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/OneCalendar-Beta31.apk",
-  "changelog": "One UI 1.0 (Beta 31) 업데이트 완료! 백그라운드 서비스를 안전하게 완전히 제거하여 앱의 비정상 종료(크래시) 문제를 완벽하게 해결하였습니다."
+  "latestBuildNumber": 32,
+  "versionName": "One UI 1.0 (Beta 32)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2032).apk",
+  "changelog": "One UI 1.0 (Beta 32) 업데이트 완료! 테마(다크 모드 옵션 분리), 액션 바, 애니메이션, 소리 설정(슬라이더 분리) 메뉴의 명칭을 다듬고 메인 설정의 모든 토글 스위치를 화살표 이동형 상세 설정 방식으로 개선하였습니다."
 }

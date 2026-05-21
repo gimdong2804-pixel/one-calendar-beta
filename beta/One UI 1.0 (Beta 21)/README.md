@@ -5,7 +5,7 @@ Android-only beta build for direct testing.
 - App label: One Calendar Beta
 - Android version name: 1.0.0-beta.21
 - Android version code: 21
-- APK: `one-calendar-one-ui-1.0-beta-21.apk`
+- APK: `One UI 1.0 (Beta 21).apk`
 - SHA256: `4B7281CC7030357E1E462FE77537B0EF6D52AE5186BD684AE5A3EFE4BC705AC9`
 
 ## Fixes

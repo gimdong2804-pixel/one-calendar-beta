@@ -1,4 +1,4 @@
-# One UI 1.0 (Beta 27) Release
+# One UI 1.0 (Beta 27)
 
 ## 변경 사항
 - One UI 8.5 소프트웨어 업데이트 화면 디자인 전면 개편 적용
@@ -8,5 +8,5 @@
 - 구체 3D 스타일 프리미엄 다크 테마 기반의 상세 화면(SoftwareUpdateDetailScreen) 신규 구현
 
 ## 파일 정보
-- **파일명:** one-calendar-one-ui-1.0-beta-27.apk
+- **파일명:** One UI 1.0 (Beta 27).apk
 - **SHA256 Checksum:** A2F39FCF74FA58FF0E9FA772BBD380D655A497CCC1AC6815D40CD788F7D39495

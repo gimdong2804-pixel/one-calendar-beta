@@ -1,4 +1,4 @@
-# One UI 1.0 (Beta 30) Release
+# One UI 1.0 (Beta 30)
 
 ## 변경 사항
 - **백그라운드 업데이트 서비스 크래시 버그 원천적 해결 (`flutter_background_service`)**:
@@ -10,5 +10,5 @@
   - 백그라운드 구동에 에러가 발생하더라도 메인 앱 진입 자체가 물리적으로 막히는 무한 락아웃(Lockout) 현상을 영구적으로 방지했습니다.
 
 ## 파일 정보
-- **파일명:** one-calendar-one-ui-1.0-beta-30.apk
+- **파일명:** One UI 1.0 (Beta 30).apk
 - **SHA256 Checksum:** 6931DB532A9721CF551995FDD2095A702868E02C1450A008F86E8F6BB0A0D9AB

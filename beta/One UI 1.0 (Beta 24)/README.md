@@ -1,4 +1,4 @@
-﻿# One UI 1.0 (Beta 24) Release
+# One UI 1.0 (Beta 24)
 
 ## 변경 사항
 - 소프트웨어 업데이트 화면 진입 시 버벅임 개선 (유기적인 그라데이션 글로우 효과 적용으로 120fps 지원)
@@ -7,5 +7,5 @@
 - 하단 업데이트 확인 버튼 폭 슬림화 적용 (240px로 조정 및 중앙 정렬)
 
 ## 파일 정보
-- **파일명:** one-calendar-one-ui-1.0-beta-24.apk
+- **파일명:** One UI 1.0 (Beta 24).apk
 - **SHA256 Checksum:** $fileHash

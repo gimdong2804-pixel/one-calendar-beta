@@ -62,30 +62,27 @@ class SettingsScreen extends StatelessWidget {
               _SettingTile(
                 icon: Icons.palette_rounded,
                 iconColor: Colors.blueAccent,
-                title: '테마 설정',
-                trailing: Switch(
-                  value: isDark,
-                  onChanged: (value) {
-                    unawaited(
-                      settings.setThemeMode(
-                        value ? ThemeMode.dark : ThemeMode.light,
-                      ),
-                    );
-                  },
-                ),
+                title: '테마',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ThemeSettingsScreen(),
+                    ),
+                  );
+                },
               ),
               _Divider(),
               _SettingTile(
                 icon: Icons.tune_rounded,
                 iconColor: Colors.indigoAccent,
-                title: '액션 바 커스텀',
+                title: '액션 바',
                 onTap: () => _showSnack(context, '액션 바 세부 커스텀은 다음 단계에서 연결됩니다.'),
               ),
               _Divider(),
               _SettingTile(
                 icon: Icons.motion_photos_auto_rounded,
                 iconColor: Colors.purpleAccent,
-                title: '애니메이션 설정',
+                title: '애니메이션',
                 onTap: () => _showSnack(context, '애니메이션 옵션은 Flutter 전환 효과 정리 후 연결됩니다.'),
               ),
             ],
@@ -100,34 +97,15 @@ class SettingsScreen extends StatelessWidget {
                     ? Icons.volume_up_rounded
                     : Icons.volume_off_rounded,
                 iconColor: Colors.lightBlue,
-                title: '소리 설정',
-                trailing: Switch(
-                  value: settings.isSoundEnabled,
-                  onChanged: (value) => unawaited(settings.setSoundEnabled(value)),
-                ),
+                title: '소리',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const SoundSettingsScreen(),
+                    ),
+                  );
+                },
               ),
-              if (settings.isSoundEnabled) ...[
-                _Divider(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '소리 크기: ${(settings.soundVolume * 100).round()}%',
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      Slider(
-                        value: settings.soundVolume,
-                        min: 0,
-                        max: 1,
-                        divisions: 20,
-                        onChanged: (value) => unawaited(settings.setSoundVolume(value)),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ],
           ),
           const SizedBox(height: 16),
@@ -261,4 +239,133 @@ void _showSnack(BuildContext context, String message) {
     ..showSnackBar(
       SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
+}
+
+class ThemeSettingsScreen extends StatelessWidget {
+  const ThemeSettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = context.watch<SettingsProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Colors.black : const Color(0xFFF2F2F7);
+
+    return Scaffold(
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text('테마', style: TextStyle(fontWeight: FontWeight.w700)),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        children: [
+          _SettingGroup(
+            children: [
+              _SettingTile(
+                icon: Icons.dark_mode_rounded,
+                iconColor: Colors.purpleAccent,
+                title: '다크 모드',
+                trailing: Switch(
+                  value: isDark,
+                  onChanged: (value) {
+                    unawaited(
+                      settings.setThemeMode(
+                        value ? ThemeMode.dark : ThemeMode.light,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SoundSettingsScreen extends StatelessWidget {
+  const SoundSettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = context.watch<SettingsProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Colors.black : const Color(0xFFF2F2F7);
+
+    return Scaffold(
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text('소리', style: TextStyle(fontWeight: FontWeight.w700)),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        children: [
+          _SettingGroup(
+            children: [
+              _SettingTile(
+                icon: settings.isSoundEnabled
+                    ? Icons.volume_up_rounded
+                    : Icons.volume_off_rounded,
+                iconColor: Colors.lightBlue,
+                title: '소리',
+                trailing: Switch(
+                  value: settings.isSoundEnabled,
+                  onChanged: (value) => unawaited(settings.setSoundEnabled(value)),
+                ),
+              ),
+              if (settings.isSoundEnabled) ...[
+                _Divider(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          '소리 크기: ${(settings.soundVolume * 100).round()}%',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      Slider(
+                        value: settings.soundVolume,
+                        min: 0,
+                        max: 1,
+                        divisions: 20,
+                        onChanged: (value) => unawaited(settings.setSoundVolume(value)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

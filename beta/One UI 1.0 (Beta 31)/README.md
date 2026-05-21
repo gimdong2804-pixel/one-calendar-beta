@@ -1,4 +1,4 @@
-# One UI 1.0 (Beta 31) Release
+# One UI 1.0 (Beta 31)
 
 ## 변경 사항
 - **백그라운드 업데이트 확인 서비스 완전 제거 (`flutter_background_service`)**:
@@ -8,5 +8,5 @@
   - 앱 내의 소프트웨어 업데이트 기능은 수동 방식("업데이트 확인" 버튼 터치 시 쾌속 조회)으로 안전하게 우회 가동됩니다.
 
 ## 파일 정보
-- **파일명:** one-calendar-one-ui-1.0-beta-31.apk
+- **파일명:** One UI 1.0 (Beta 31).apk
 - **SHA256 Checksum:** 358A5A1B69EB839BD82865B7137F258319DD56116CFCD29C798F61D2298FB13E

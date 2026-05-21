@@ -1,4 +1,4 @@
-# One UI 1.0 (Beta 29) Release
+# One UI 1.0 (Beta 29)
 
 ## 변경 사항
 - **실시간 백그라운드 업데이트 모니터링 서비스 탑재 (`flutter_background_service`)**:
@@ -16,5 +16,5 @@
   - 향후 추가적인 다른 기능 탑재 시 유연하게 연동할 수 있도록 더보기 버튼 아이콘은 보존하되, 클릭 시 플레이스홀더 스낵바가 단정히 출력되도록 교체했습니다.
 
 ## 파일 정보
-- **파일명:** one-calendar-one-ui-1.0-beta-29.apk
+- **파일명:** One UI 1.0 (Beta 29).apk
 - **SHA256 Checksum:** AF93FF7DDAD210B452B2302D586E763D82DA837B8D3E5BE5639D0EC941F454B9
