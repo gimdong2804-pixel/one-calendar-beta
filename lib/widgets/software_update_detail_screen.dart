@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../providers/settings_provider.dart';
 import '../services/update_service.dart';
 
 enum DownloadState { idle, downloading, completed, error }
@@ -368,6 +370,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
             onTap: onPressed,
             highlightColor: Colors.white10,
             splashColor: Colors.white.withOpacity(0.15),
+            enableFeedback: context.watch<SettingsProvider>().isSoundEnabled,
             child: Stack(
               alignment: Alignment.center,
               children: [

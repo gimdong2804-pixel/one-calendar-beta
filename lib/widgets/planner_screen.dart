@@ -1674,6 +1674,7 @@ class _FullWidthButton extends StatelessWidget {
       child: InkWell(
         customBorder: const StadiumBorder(),
         onTap: onPressed,
+        enableFeedback: context.watch<SettingsProvider>().isSoundEnabled,
         child: SizedBox(
           height: 56,
           child: Row(

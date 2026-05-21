@@ -20,7 +20,7 @@ class AppTheme {
   static const Color darkAccentPrimary = Color(0xFF818CF8);
   static const Color darkAccentSecondary = Color(0xFFF472B6);
 
-  static ThemeData get lightTheme => _theme(
+  static ThemeData lightTheme(bool isSoundEnabled) => _theme(
     brightness: Brightness.light,
     scaffold: lightBgBody,
     surface: lightBgCard,
@@ -29,9 +29,10 @@ class AppTheme {
     textPrimary: lightTextPrimary,
     textSecondary: lightTextSecondary,
     textMuted: lightTextMuted,
+    isSoundEnabled: isSoundEnabled,
   );
 
-  static ThemeData get darkTheme => _theme(
+  static ThemeData darkTheme(bool isSoundEnabled) => _theme(
     brightness: Brightness.dark,
     scaffold: darkBgBody,
     surface: darkBgCard,
@@ -40,6 +41,7 @@ class AppTheme {
     textPrimary: darkTextPrimary,
     textSecondary: darkTextSecondary,
     textMuted: darkTextMuted,
+    isSoundEnabled: isSoundEnabled,
   );
 
   static ThemeData _theme({
@@ -51,6 +53,7 @@ class AppTheme {
     required Color textPrimary,
     required Color textSecondary,
     required Color textMuted,
+    required bool isSoundEnabled,
   }) {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: primary,
@@ -69,6 +72,42 @@ class AppTheme {
         tertiary: accentTertiary,
         surface: surface,
         onSurface: textPrimary,
+      ),
+      listTileTheme: ListTileThemeData(
+        enableFeedback: isSoundEnabled,
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: ButtonStyle(
+          enableFeedback: isSoundEnabled,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ButtonStyle(
+          enableFeedback: isSoundEnabled,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: ButtonStyle(
+          enableFeedback: isSoundEnabled,
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: ButtonStyle(
+          enableFeedback: isSoundEnabled,
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: ButtonStyle(
+          enableFeedback: isSoundEnabled,
+        ),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        enableFeedback: isSoundEnabled,
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        enableFeedback: isSoundEnabled,
+      ),
+      navigationBarTheme: const NavigationBarThemeData(
       ),
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,

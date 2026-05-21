@@ -337,31 +337,44 @@ class SoundSettingsScreen extends StatelessWidget {
                   onChanged: (value) => unawaited(settings.setSoundEnabled(value)),
                 ),
               ),
-              if (settings.isSoundEnabled) ...[
-                _Divider(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          '소리 크기: ${(settings.soundVolume * 100).round()}%',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                      Slider(
-                        value: settings.soundVolume,
-                        min: 0,
-                        max: 1,
-                        divisions: 20,
-                        onChanged: (value) => unawaited(settings.setSoundVolume(value)),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: settings.isSoundEnabled
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _Divider(),
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 250),
+                            opacity: settings.isSoundEnabled ? 1.0 : 0.0,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: Text(
+                                      '소리 크기: ${(settings.soundVolume * 100).round()}%',
+                                      style: const TextStyle(fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  Slider(
+                                    value: settings.soundVolume,
+                                    min: 0,
+                                    max: 1,
+                                    divisions: 20,
+                                    onChanged: (value) => unawaited(settings.setSoundVolume(value)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
+              ),
             ],
           ),
         ],

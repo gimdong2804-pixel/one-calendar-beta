@@ -10,6 +10,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'providers/planner_provider.dart';
 import 'providers/settings_provider.dart';
+import 'services/background_update_service.dart';
 import 'theme.dart';
 import 'widgets/planner_screen.dart';
 
@@ -28,6 +29,14 @@ Future<void> main() async {
       await windowManager.show();
       await windowManager.focus();
     });
+  }
+
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    try {
+      await BackgroundUpdateService.initialize();
+    } catch (e) {
+      debugPrint('백그라운드 업데이트 서비스 초기화 실패: $e');
+    }
   }
 
   Intl.defaultLocale = 'ko_KR';
@@ -49,12 +58,14 @@ class OneCalendarApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = context.watch<SettingsProvider>().themeMode;
+    final settings = context.watch<SettingsProvider>();
+    final themeMode = settings.themeMode;
+    final isSoundEnabled = settings.isSoundEnabled;
 
     return MaterialApp(
       title: 'One Calendar',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme(isSoundEnabled),
+      darkTheme: AppTheme.darkTheme(isSoundEnabled),
       themeMode: themeMode,
       locale: const Locale('ko', 'KR'),
       supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
