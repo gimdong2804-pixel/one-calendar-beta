@@ -171,6 +171,7 @@ class _DesktopDateHeader extends StatelessWidget {
               onPressed: () => unawaited(planner.changeDate(-1)),
             ),
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => _pickDate(context),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -233,6 +234,7 @@ class _MobileDateDock extends StatelessWidget {
               ),
               Expanded(
                 child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => _pickDate(context),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 2),
@@ -425,6 +427,7 @@ class _ModeToggleButton extends StatelessWidget {
     final tertiary = Theme.of(context).colorScheme.tertiary;
     final color = isTodoPanel ? tertiary : primary;
     final button = GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: context.read<PlannerProvider>().togglePriorityTodoPanel,
       child: DecoratedBox(
         decoration: ShapeDecoration(
@@ -1782,6 +1785,7 @@ class _PomodoroCheck extends StatelessWidget {
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
@@ -1966,6 +1970,7 @@ class _MiniCircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onPressed,
       child: DecoratedBox(
         decoration: BoxDecoration(

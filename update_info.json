@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 35,
-  "versionName": "One UI 1.0 (Beta 35)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2035)/One%20UI%201.0%20(Beta%2035).apk",
-  "changelog": "One UI 1.0 (Beta 35) 업데이트가 완료되었습니다!\n1. 백그라운드 Isolate 런타임의 connectivity_plus 의존성을 제거하여 앱 강제 종료 및 무한 크래시 현상을 완벽히 해결했습니다.\n2. 서비스 전체 생명주기 및 타이머 구문에 강력한 전역 예외 방어 처리를 도입하여 안정성을 대폭 향상했습니다."
+  "latestBuildNumber": 36,
+  "versionName": "One UI 1.0 (Beta 36)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2036)/One%20UI%201.0%20(Beta%2036).apk",
+  "changelog": "One UI 1.0 (Beta 36) 업데이트가 완료되었습니다!\n1. 할 일 목록 열기 버튼을 포함한 플래너 화면 내 여러 터치 영역의 반응성이 대폭 향상되었습니다. 이제 투명한 여백을 클릭해도 오작동 없이 안정적으로 탭이 인식됩니다.\n2. 포모도로 체크박스 및 미니 날짜 이동 버튼 등의 탭 인식 경계를 정밀 조정하여 오터치 반응 속도를 개선했습니다."
 }
