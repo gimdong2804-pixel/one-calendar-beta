@@ -178,7 +178,20 @@ class BackgroundUpdateService {
   static Future<void> initialize() async {
     final service = FlutterBackgroundService();
 
-    // 1. Android 알림 채널 생성
+    // 1. 알림 플러그인 초기화 우선 수행
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initSettings =
+        InitializationSettings(android: androidSettings);
+
+    await notificationsPlugin.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        debugPrint('알림 클릭됨: ${response.payload}');
+      },
+    );
+
+    // 2. Android 알림 채널 생성
     const AndroidNotificationChannel updateChannel = AndroidNotificationChannel(
       notificationChannelId,
       '소프트웨어 업데이트 알림',
@@ -206,20 +219,7 @@ class BackgroundUpdateService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(foregroundChannel);
 
-    // 2. 알림 플러그인 초기화
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidSettings);
-
-    await notificationsPlugin.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        debugPrint('알림 클릭됨: ${response.payload}');
-      },
-    );
-
-    // 2.5 Android 13+ 알림 권한 요청
+    // 3. Android 13+ 알림 권한 요청
     if (Platform.isAndroid) {
       await notificationsPlugin
           .resolvePlatformSpecificImplementation<
