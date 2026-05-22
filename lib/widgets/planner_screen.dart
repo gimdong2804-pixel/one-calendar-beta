@@ -402,6 +402,7 @@ class PrioritiesCard extends StatelessWidget {
             duration: const Duration(milliseconds: 260),
             curve: Curves.easeOutCubic,
             alignment: Alignment.topCenter,
+            clipBehavior: Clip.none,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
               switchInCurve: Curves.easeOutCubic,
@@ -671,13 +672,6 @@ class _PriorityMobileCard extends StatelessWidget {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: context.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 28,
-            offset: const Offset(0, 16),
-          ),
-        ],
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 176),
@@ -888,13 +882,6 @@ class _TodoRowState extends State<TodoRow> with SingleTickerProviderStateMixin {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: context.borderSubtle),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
-              ),
-            ],
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -985,6 +972,7 @@ class TimeBlockCard extends StatelessWidget {
             duration: const Duration(milliseconds: 260),
             curve: Curves.easeOutCubic,
             alignment: Alignment.topCenter,
+            clipBehavior: Clip.none,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -1178,19 +1166,12 @@ class _TimeBlockMobileCard extends StatelessWidget {
   final VoidCallback onDelete;
 
   @override
-  Widget build(BuildContext context) {
+    Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: context.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 118),
@@ -1641,13 +1622,6 @@ class _InputPill extends StatelessWidget {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: context.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),

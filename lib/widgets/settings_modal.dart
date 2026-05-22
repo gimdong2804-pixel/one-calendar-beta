@@ -340,6 +340,7 @@ class SoundSettingsScreen extends StatelessWidget {
               AnimatedSize(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
+                clipBehavior: Clip.none,
                 child: settings.isSoundEnabled
                     ? Column(
                         mainAxisSize: MainAxisSize.min,
