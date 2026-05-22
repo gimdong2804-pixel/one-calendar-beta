@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 34,
-  "versionName": "One UI 1.0 (Beta 34)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2034)/One%20UI%201.0%20(Beta%2034).apk",
-  "changelog": "One UI 1.0 (Beta 34) 업데이트가 완료되었습니다!\n1. 앱 실행 시 백그라운드 업데이트 확인 서비스 초기화에 따른 기동 지연 및 런타임 강제 종료(Crash) 현상을 전면 해결했습니다.\n2. 백그라운드 Isolate 런타임 환경에서 플랫폼 네트워크 채널 연동으로 발생하던 백그라운드 서비스의 비정상 중단 오류를 예방 및 복구하여 전체 시스템의 동작 안정성을 대폭 보강했습니다."
+  "latestBuildNumber": 35,
+  "versionName": "One UI 1.0 (Beta 35)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2035)/One%20UI%201.0%20(Beta%2035).apk",
+  "changelog": "One UI 1.0 (Beta 35) 업데이트가 완료되었습니다!\n1. 백그라운드 Isolate 런타임의 connectivity_plus 의존성을 제거하여 앱 강제 종료 및 무한 크래시 현상을 완벽히 해결했습니다.\n2. 서비스 전체 생명주기 및 타이머 구문에 강력한 전역 예외 방어 처리를 도입하여 안정성을 대폭 향상했습니다."
 }

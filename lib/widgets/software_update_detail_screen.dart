@@ -85,7 +85,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
     final subTextColor = isDark ? Colors.white54 : Colors.black45;
     final bodyTextColor = isDark ? Colors.white70 : Colors.black87;
     final dragHandleColor = isDark ? Colors.white24 : Colors.black26;
-    final cardBorderColor = isDark ? Colors.white.withOpacity(0.07) : Colors.black.withOpacity(0.05);
+    final cardBorderColor = isDark ? Colors.white.withValues(alpha: 0.07) : Colors.black.withValues(alpha: 0.05);
 
     // Transparent system bar style tailored dynamically for current theme
     final systemOverlay = SystemUiOverlayStyle(
@@ -160,7 +160,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(isDark ? 0.45 : 0.08),
+                          color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.08),
                           blurRadius: 15,
                           offset: const Offset(0, -5),
                         )
@@ -294,7 +294,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                             color: bgColor,
                             border: Border(
                               top: BorderSide(
-                                color: isDark ? Colors.white.withOpacity(0.06) : Colors.black.withOpacity(0.04),
+                                color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04),
                                 width: 1,
                               ),
                             ),
@@ -318,7 +318,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                   child: Container(
                     width: 44,
                     height: 44,
-                    color: isDark ? Colors.black.withOpacity(0.3) : Colors.white.withOpacity(0.3),
+                    color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.3),
                     child: Center(
                       child: IconButton(
                         icon: Icon(
@@ -348,7 +348,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
 
     // Colors
     const Color activeBlue = Color(0xFF2A7DFC);
-    final Color progressTrackColor = isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.05);
+    final Color progressTrackColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05);
 
     // On press handler
     final VoidCallback? onPressed = (_downloadState == DownloadState.idle || _downloadState == DownloadState.error)
@@ -369,7 +369,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
           child: InkWell(
             onTap: onPressed,
             highlightColor: Colors.white10,
-            splashColor: Colors.white.withOpacity(0.15),
+            splashColor: Colors.white.withValues(alpha: 0.15),
             enableFeedback: context.watch<SettingsProvider>().isSoundEnabled,
             child: Stack(
               alignment: Alignment.center,

@@ -15,7 +15,6 @@ class SoftwareUpdateScreen extends StatefulWidget {
 class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
   bool _startAnimation = false;
   UpdateState _updateState = UpdateState.idle;
-  UpdateInfo? _demoUpdateInfo;
 
   @override
   void initState() {
@@ -84,7 +83,6 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
     if (info.hasUpdate) {
       setState(() {
         _updateState = UpdateState.hasUpdate;
-        _demoUpdateInfo = info;
       });
       _navigateToDetail(info);
     } else {
@@ -212,8 +210,8 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                                   shape: BoxShape.circle,
                                   gradient: RadialGradient(
                                     colors: [
-                                      const Color(0xFF00F2FE).withOpacity(isDark ? 0.38 : 0.28),
-                                      const Color(0xFF00F2FE).withOpacity(0.0),
+                                      const Color(0xFF00F2FE).withValues(alpha: isDark ? 0.38 : 0.28),
+                                      const Color(0xFF00F2FE).withValues(alpha: 0.0),
                                     ],
                                     stops: const [0.0, 1.0],
                                   ),
@@ -231,8 +229,8 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                                   shape: BoxShape.circle,
                                   gradient: RadialGradient(
                                     colors: [
-                                      const Color(0xFFFF8C00).withOpacity(isDark ? 0.35 : 0.24),
-                                      const Color(0xFFFF8C00).withOpacity(0.0),
+                                      const Color(0xFFFF8C00).withValues(alpha: isDark ? 0.35 : 0.24),
+                                      const Color(0xFFFF8C00).withValues(alpha: 0.0),
                                     ],
                                     stops: const [0.0, 1.0],
                                   ),
@@ -250,8 +248,8 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                                   shape: BoxShape.circle,
                                   gradient: RadialGradient(
                                     colors: [
-                                      const Color(0xFF8A2387).withOpacity(isDark ? 0.30 : 0.20),
-                                      const Color(0xFF8A2387).withOpacity(0.0),
+                                      const Color(0xFF8A2387).withValues(alpha: isDark ? 0.30 : 0.20),
+                                      const Color(0xFF8A2387).withValues(alpha: 0.0),
                                     ],
                                     stops: const [0.0, 1.0],
                                   ),
@@ -277,7 +275,7 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                               shadows: isDark
                                   ? [
                                       Shadow(
-                                        color: Colors.black.withOpacity(0.3),
+                                        color: Colors.black.withValues(alpha: 0.3),
                                         offset: const Offset(0, 4),
                                         blurRadius: 10,
                                       ),

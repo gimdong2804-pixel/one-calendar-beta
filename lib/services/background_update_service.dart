@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui'; // DartPluginRegistrant 사용을 위해 필수
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -13,45 +12,65 @@ import 'update_service.dart';
 /// iOS 백그라운드 트리거 시 실행 (iOS는 1분 주기가 허용되지 않아 백그라운드 fetch 작동 시 실행)
 @pragma('vm:entry-point')
 Future<bool> onStartBackground(ServiceInstance service) async {
-  WidgetsFlutterBinding.ensureInitialized();
-  DartPluginRegistrant.ensureInitialized(); // 백그라운드 Isolate 내 플러그인 바인딩 강제 활성화
-  await _performUpdateCheckFlow(null);
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    DartPluginRegistrant.ensureInitialized(); // 백그라운드 Isolate 내 플러그인 바인딩 강제 활성화
+    await _performUpdateCheckFlow(null);
+  } catch (e) {
+    debugPrint('[백그라운드 서비스] iOS 백그라운드 기동 예외 발생: $e');
+  }
   return true;
 }
 
 /// 백그라운드 Isolate 진입점 (실제 1분 주기 타이머 구동)
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
-  WidgetsFlutterBinding.ensureInitialized();
   try {
-    DartPluginRegistrant.ensureInitialized(); // 백그라운드 Isolate 내 플러그인 바인딩 강제 활성화
-  } catch (e) {
-    debugPrint('[백그라운드 서비스] 플러그인 바인딩 초기화 에러: $e');
-  }
-
-  // 포그라운드 서비스 알림 채널 연동
-  if (service is AndroidServiceInstance) {
-    service.on('setAsForeground').listen((event) {
-      service.setAsForegroundService();
-    });
-
-    service.on('setAsBackground').listen((event) {
-      service.setAsBackgroundService();
-    });
-  }
-
-  service.on('stopService').listen((event) {
-    service.stopSelf();
-  });
-
-  // 1분 간격 주기적인 업데이트 확인 타이머 설정
-  Timer.periodic(const Duration(minutes: 1), (timer) async {
+    WidgetsFlutterBinding.ensureInitialized();
     try {
-      await _performUpdateCheckFlow(service);
+      DartPluginRegistrant.ensureInitialized(); // 백그라운드 Isolate 내 플러그인 바인딩 강제 활성화
     } catch (e) {
-      debugPrint('[백그라운드 서비스] 타이머 런타임 오류: $e');
+      debugPrint('[백그라운드 서비스] 플러그인 바인딩 초기화 에러: $e');
     }
-  });
+
+    // 포그라운드 서비스 알림 채널 연동
+    if (service is AndroidServiceInstance) {
+      service.on('setAsForeground').listen((event) {
+        try {
+          service.setAsForegroundService();
+        } catch (e) {
+          debugPrint('[백그라운드 서비스] 포그라운드 서비스 전환 에러: $e');
+        }
+      });
+
+      service.on('setAsBackground').listen((event) {
+        try {
+          service.setAsBackgroundService();
+        } catch (e) {
+          debugPrint('[백그라운드 서비스] 백그라운드 서비스 전환 에러: $e');
+        }
+      });
+    }
+
+    service.on('stopService').listen((event) {
+      try {
+        service.stopSelf();
+      } catch (e) {
+        debugPrint('[백그라운드 서비스] stopSelf 에러: $e');
+      }
+    });
+
+    // 1분 간격 주기적인 업데이트 확인 타이머 설정
+    Timer.periodic(const Duration(minutes: 1), (timer) async {
+      try {
+        await _performUpdateCheckFlow(service);
+      } catch (e) {
+        debugPrint('[백그라운드 서비스] 타이머 런타임 오류: $e');
+      }
+    });
+  } catch (globalException) {
+    debugPrint('[백그라운드 서비스] onStart 전역 치명적 오류 발생: $globalException');
+  }
 }
 
 /// 실제 업데이트 체크 프로세스 비즈니스 로직 (탑레벨 함수로 추출)
@@ -59,21 +78,11 @@ Future<void> _performUpdateCheckFlow(ServiceInstance? service) async {
   try {
     debugPrint('[백그라운드 서비스] 1분 업데이트 체크 타이머 시작');
 
-    // 1. 인터넷 연결 유무 파악 (없으면 즉시 중단하여 불필요 리소스 제거)
-    List<ConnectivityResult> connectivityResult = [];
-    try {
-      connectivityResult = await Connectivity().checkConnectivity();
-    } catch (e) {
-      debugPrint('[백그라운드 서비스] 인터넷 연결 상태 조회 실패: $e');
-      connectivityResult = [ConnectivityResult.wifi]; // 안전 장치: 조회 오류 시 진행 허용
-    }
+    // connectivity_plus 의존성을 제거하고 바로 UpdateService.checkForUpdate()를 수행합니다.
+    // 만약 인터넷 연결이 끊어져 있다면 HttpClient 레벨에서 예외(SocketException 등)가 발생하여
+    // checkForUpdate() 내부 및 본 try-catch에서 안전하게 처리됩니다.
 
-    if (connectivityResult.contains(ConnectivityResult.none)) {
-      debugPrint('[백그라운드 서비스] 인터넷 연결 없음. 조회를 스킵합니다.');
-      return;
-    }
-
-    // 2. 서버 업데이트 JSON 파싱 조회
+    // 서버 업데이트 JSON 파싱 조회
     final info = await UpdateService.checkForUpdate();
     if (info == null) {
       debugPrint('[백그라운드 서비스] 업데이트 정보 로드 실패 또는 데이터 없음.');
@@ -92,7 +101,7 @@ Future<void> _performUpdateCheckFlow(ServiceInstance? service) async {
       );
     }
 
-    // 3. 신규 업데이트 감지
+    // 신규 업데이트 감지
     if (info.hasUpdate) {
       final prefs = await SharedPreferences.getInstance();
       final lastNotifiedBuild = prefs.getInt('last_notified_build') ?? 0;
