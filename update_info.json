@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 36,
-  "versionName": "One UI 1.0 (Beta 36)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2036)/One%20UI%201.0%20(Beta%2036).apk",
-  "changelog": "One UI 1.0 (Beta 36) 업데이트가 완료되었습니다!\n1. 할 일 목록 열기 버튼을 포함한 플래너 화면 내 여러 터치 영역의 반응성이 대폭 향상되었습니다. 이제 투명한 여백을 클릭해도 오작동 없이 안정적으로 탭이 인식됩니다.\n2. 포모도로 체크박스 및 미니 날짜 이동 버튼 등의 탭 인식 경계를 정밀 조정하여 오터치 반응 속도를 개선했습니다."
+  "latestBuildNumber": 37,
+  "versionName": "One UI 1.0 (Beta 37)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2037)/One%20UI%201.0%20(Beta%2037).apk",
+  "changelog": "One UI 1.0 (Beta 37) 업데이트가 완료되었습니다!\n1. 설정창 테마 변경 시 다크 모드와 라이트 모드 간에 300ms 동안 모든 화면 요소가 자연스럽고 부드럽게 변화하도록 테마 전환 애니메이션을 추가하였습니다.\n2. 테마 전환 후 뒤로 가기(pop)를 할 때 이전 화면에서 글자가 일시적으로 요동치거나 깜빡거리던 버그를 완전히 해결했습니다.\n3. 터치 및 미니 날짜 이동 등 전반적인 반응성과 안정성을 최적화했습니다."
 }
