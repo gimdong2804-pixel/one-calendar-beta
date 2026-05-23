@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 39,
-  "versionName": "One UI 1.0 (Beta 39)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2039)/One%20UI%201.0%20(Beta%2039).apk",
-  "changelog": "One UI 1.0 (Beta 39) 업데이트가 완료되었습니다!\n1. 다크 모드 전환 애니메이션이 앱 전체에서 일관되게 적용됩니다. MaterialApp 레벨에서 420ms easeOutCubic 전환을 통일하여 UI가 제각각 노는 현상을 해결했습니다.\n2. 테마 설정에서 다크/라이트 모드를 변경한 후 뒤로 갈 때 라이트 모드로 잠깐 깜빡였다가 다크 모드로 변하던 버그를 수정했습니다. 개별 화면의 중복된 AnimatedTheme 래핑을 제거하여 전환 충돌을 완전히 해소했습니다."
+  "latestBuildNumber": 40,
+  "versionName": "One UI 1.0 (Beta 40)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2040)/One%20UI%201.0%20(Beta%2040).apk",
+  "changelog": "One UI 1.0 (Beta 40) 업데이트가 완료되었습니다!\n1. 설정창에서 상태표시줄 텍스트(시계, 아이콘 등) 색상이 배경색에 맞게 자동으로 변경되도록 수정했습니다."
 }

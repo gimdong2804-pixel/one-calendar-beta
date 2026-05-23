@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
@@ -22,6 +23,7 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
           backgroundColor: bgColor,
           appBar: AppBar(
+            systemOverlayStyle: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
             backgroundColor: Colors.transparent,
             elevation: 0,
             scrolledUnderElevation: 0,
@@ -295,6 +297,7 @@ class ThemeSettingsScreen extends StatelessWidget {
     return Scaffold(
           backgroundColor: bgColor,
           appBar: AppBar(
+            systemOverlayStyle: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
             backgroundColor: Colors.transparent,
             elevation: 0,
             scrolledUnderElevation: 0,
@@ -356,6 +359,7 @@ class SoundSettingsScreen extends StatelessWidget {
     return Scaffold(
           backgroundColor: bgColor,
           appBar: AppBar(
+            systemOverlayStyle: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
             backgroundColor: Colors.transparent,
             elevation: 0,
             scrolledUnderElevation: 0,
