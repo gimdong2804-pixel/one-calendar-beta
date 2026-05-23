@@ -19,15 +19,8 @@ class SettingsScreen extends StatelessWidget {
     final bgColor = isDark ? Colors.black : const Color(0xFFF2F2F7);
     final onSurfaceColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
 
-    return AnimatedTheme(
-      data: Theme.of(context),
-      duration: const Duration(milliseconds: 400),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.ease,
-        color: bgColor,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
+    return Scaffold(
+          backgroundColor: bgColor,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -157,8 +150,6 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 40),
             ],
           ),
-        ),
-      ),
     );
   }
 }
@@ -172,8 +163,8 @@ class _SettingGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.ease,
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeOutCubic,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
         borderRadius: BorderRadius.circular(22),
@@ -301,15 +292,8 @@ class ThemeSettingsScreen extends StatelessWidget {
     final bgColor = isDark ? Colors.black : const Color(0xFFF2F2F7);
     final onSurfaceColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
 
-    return AnimatedTheme(
-      data: Theme.of(context),
-      duration: const Duration(milliseconds: 400),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.ease,
-        color: bgColor,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
+    return Scaffold(
+          backgroundColor: bgColor,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -355,8 +339,6 @@ class ThemeSettingsScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 }
@@ -371,15 +353,8 @@ class SoundSettingsScreen extends StatelessWidget {
     final bgColor = isDark ? Colors.black : const Color(0xFFF2F2F7);
     final onSurfaceColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
 
-    return AnimatedTheme(
-      data: Theme.of(context),
-      duration: const Duration(milliseconds: 400),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.ease,
-        color: bgColor,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
+    return Scaffold(
+          backgroundColor: bgColor,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -463,8 +438,6 @@ class SoundSettingsScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 }

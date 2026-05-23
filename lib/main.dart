@@ -82,6 +82,8 @@ class _OneCalendarAppState extends State<OneCalendarApp> {
       theme: AppTheme.lightTheme(isSoundEnabled),
       darkTheme: AppTheme.darkTheme(isSoundEnabled),
       themeMode: themeMode,
+      themeAnimationDuration: const Duration(milliseconds: 420),
+      themeAnimationCurve: Curves.easeOutCubic,
       locale: const Locale('ko', 'KR'),
       supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
       localizationsDelegates: const [

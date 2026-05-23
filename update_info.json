@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 38,
-  "versionName": "One UI 1.0 (Beta 38)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2038)/One%20UI%201.0%20(Beta%2038).apk",
-  "changelog": "One UI 1.0 (Beta 38) 업데이트가 완료되었습니다!\n1. 설정창 테마 변경 시 다크 모드와 라이트 모드 전환 애니메이션 속도와 커브(400ms, Curves.ease)를 메인 화면의 다크모드 아이콘 전환 효과와 동일하게 맞춰 일체감 있고 부드러운 전환을 완성했습니다.\n2. 테마 전환 후 뒤로 가기(pop)를 할 때 글자가 깜빡거리던 버그가 완벽하게 교정되었습니다."
+  "latestBuildNumber": 39,
+  "versionName": "One UI 1.0 (Beta 39)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2039)/One%20UI%201.0%20(Beta%2039).apk",
+  "changelog": "One UI 1.0 (Beta 39) 업데이트가 완료되었습니다!\n1. 다크 모드 전환 애니메이션이 앱 전체에서 일관되게 적용됩니다. MaterialApp 레벨에서 420ms easeOutCubic 전환을 통일하여 UI가 제각각 노는 현상을 해결했습니다.\n2. 테마 설정에서 다크/라이트 모드를 변경한 후 뒤로 갈 때 라이트 모드로 잠깐 깜빡였다가 다크 모드로 변하던 버그를 수정했습니다. 개별 화면의 중복된 AnimatedTheme 래핑을 제거하여 전환 충돌을 완전히 해소했습니다."
 }
