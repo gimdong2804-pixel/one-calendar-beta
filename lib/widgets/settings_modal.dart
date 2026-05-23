@@ -21,9 +21,10 @@ class SettingsScreen extends StatelessWidget {
 
     return AnimatedTheme(
       data: Theme.of(context),
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 400),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.ease,
         color: bgColor,
         child: Scaffold(
           backgroundColor: Colors.transparent,
@@ -171,8 +172,8 @@ class _SettingGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.ease,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
         borderRadius: BorderRadius.circular(22),
@@ -302,9 +303,10 @@ class ThemeSettingsScreen extends StatelessWidget {
 
     return AnimatedTheme(
       data: Theme.of(context),
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 400),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.ease,
         color: bgColor,
         child: Scaffold(
           backgroundColor: Colors.transparent,
@@ -371,9 +373,10 @@ class SoundSettingsScreen extends StatelessWidget {
 
     return AnimatedTheme(
       data: Theme.of(context),
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 400),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.ease,
         color: bgColor,
         child: Scaffold(
           backgroundColor: Colors.transparent,
