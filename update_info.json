@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 40,
-  "versionName": "One UI 1.0 (Beta 40)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2040)/One%20UI%201.0%20(Beta%2040).apk",
-  "changelog": "One UI 1.0 (Beta 40) 업데이트가 완료되었습니다!\n1. 설정창에서 상태표시줄 텍스트(시계, 아이콘 등) 색상이 배경색에 맞게 자동으로 변경되도록 수정했습니다."
+  "latestBuildNumber": 41,
+  "versionName": "One UI 1.0 (Beta 41)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2041)/One%20UI%201.0%20(Beta%2041).apk",
+  "changelog": "One UI 1.0 (Beta 41) 업데이트가 완료되었습니다!\n1. 다크/라이트 모드 전환 시 하드코딩된 색상으로 인한 버그를 수정했습니다.\n2. 설정, 소프트웨어 업데이트, 업데이트 상세 화면에서 테마 변경이 올바르게 반영되도록 개선했습니다."
 }

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../theme.dart';
 import 'package:provider/provider.dart';
 import '../providers/settings_provider.dart';
 import '../services/update_service.dart';
@@ -78,14 +79,14 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Premium theme-adaptive color tokens
-    final bgColor = isDark ? const Color(0xFF121216) : const Color(0xFFFAFAFD);
-    final cardBgColor = isDark ? const Color(0xFF1C1C22) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-    final subTextColor = isDark ? Colors.white54 : Colors.black45;
-    final bodyTextColor = isDark ? Colors.white70 : Colors.black87;
-    final dragHandleColor = isDark ? Colors.white24 : Colors.black26;
-    final cardBorderColor = isDark ? Colors.white.withValues(alpha: 0.07) : Colors.black.withValues(alpha: 0.05);
+    // Modern One UI colors
+    final bgColor = context.updateDetailBg;
+    final cardBgColor = context.updateDetailCardBg;
+    final textColor = context.settingsOnSurface;
+    final subTextColor = context.updateSubText;
+    final bodyTextColor = context.updateBodyText;
+    final dragHandleColor = context.updateDragHandle;
+    final cardBorderColor = context.updateCardBorder;
 
     // Transparent system bar style tailored dynamically for current theme
     final systemOverlay = SystemUiOverlayStyle(
@@ -160,7 +161,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.08),
+                          color: context.updateCardShadow,
                           blurRadius: 15,
                           offset: const Offset(0, -5),
                         )
@@ -294,7 +295,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                             color: bgColor,
                             border: Border(
                               top: BorderSide(
-                                color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04),
+                                color: context.updateLogBg,
                                 width: 1,
                               ),
                             ),
@@ -318,12 +319,12 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                   child: Container(
                     width: 44,
                     height: 44,
-                    color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.3),
+                    color: context.updateLogBg,
                     child: Center(
                       child: IconButton(
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+                          color: context.settingsOnSurface,
                           size: 18,
                         ),
                         onPressed: () => Navigator.of(context).pop(),
@@ -348,7 +349,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
 
     // Colors
     const Color activeBlue = Color(0xFF2A7DFC);
-    final Color progressTrackColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05);
+    final Color progressTrackColor = context.updateProgressTrack;
 
     // On press handler
     final VoidCallback? onPressed = (_downloadState == DownloadState.idle || _downloadState == DownloadState.error)

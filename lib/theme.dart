@@ -64,6 +64,9 @@ class AppTheme {
     );
 
     return ThemeData(
+      extensions: [
+        brightness == Brightness.light ? lightAppThemeColors : darkAppThemeColors,
+      ],
       brightness: brightness,
       scaffoldBackgroundColor: scaffold,
       colorScheme: colorScheme.copyWith(
@@ -167,16 +170,169 @@ class AppTheme {
   }
 }
 
-extension AppThemeColors on BuildContext {
-  Color get mutedText => Theme.of(this).brightness == Brightness.dark
-      ? AppTheme.darkTextMuted
-      : AppTheme.lightTextMuted;
+class AppThemeColors extends ThemeExtension<AppThemeColors> {
+  final Color mutedText;
+  final Color borderSubtle;
+  final Color softInput;
+  final Color settingsBg;
+  final Color settingsGroupBg;
+  final Color settingsOnSurface;
+  final Color glassShadow;
+  final Color updateBg;
+  final Color updateDetailBg;
+  final Color updateDetailCardBg;
+  final Color updateSubText;
+  final Color updateBodyText;
+  final Color updateDragHandle;
+  final Color updateCardBorder;
+  final Color updateCardShadow;
+  final Color updateProgressTrack;
+  final Color updateLogBg;
 
-  Color get borderSubtle => Theme.of(this).brightness == Brightness.dark
-      ? Colors.white.withValues(alpha: 0.1)
-      : const Color(0xFFE2E8F0);
+  const AppThemeColors({
+    required this.mutedText,
+    required this.borderSubtle,
+    required this.softInput,
+    required this.settingsBg,
+    required this.settingsGroupBg,
+    required this.settingsOnSurface,
+    required this.glassShadow,
+    required this.updateBg,
+    required this.updateDetailBg,
+    required this.updateDetailCardBg,
+    required this.updateSubText,
+    required this.updateBodyText,
+    required this.updateDragHandle,
+    required this.updateCardBorder,
+    required this.updateCardShadow,
+    required this.updateProgressTrack,
+    required this.updateLogBg,
+  });
 
-  Color get softInput => Theme.of(this).brightness == Brightness.dark
-      ? const Color(0xFF0F172A).withValues(alpha: 0.62)
-      : Colors.white.withValues(alpha: 0.82);
+  @override
+  AppThemeColors copyWith({
+    Color? mutedText,
+    Color? borderSubtle,
+    Color? softInput,
+    Color? settingsBg,
+    Color? settingsGroupBg,
+    Color? settingsOnSurface,
+    Color? glassShadow,
+    Color? updateBg,
+    Color? updateDetailBg,
+    Color? updateDetailCardBg,
+    Color? updateSubText,
+    Color? updateBodyText,
+    Color? updateDragHandle,
+    Color? updateCardBorder,
+    Color? updateCardShadow,
+    Color? updateProgressTrack,
+    Color? updateLogBg,
+  }) {
+    return AppThemeColors(
+      mutedText: mutedText ?? this.mutedText,
+      borderSubtle: borderSubtle ?? this.borderSubtle,
+      softInput: softInput ?? this.softInput,
+      settingsBg: settingsBg ?? this.settingsBg,
+      settingsGroupBg: settingsGroupBg ?? this.settingsGroupBg,
+      settingsOnSurface: settingsOnSurface ?? this.settingsOnSurface,
+      glassShadow: glassShadow ?? this.glassShadow,
+      updateBg: updateBg ?? this.updateBg,
+      updateDetailBg: updateDetailBg ?? this.updateDetailBg,
+      updateDetailCardBg: updateDetailCardBg ?? this.updateDetailCardBg,
+      updateSubText: updateSubText ?? this.updateSubText,
+      updateBodyText: updateBodyText ?? this.updateBodyText,
+      updateDragHandle: updateDragHandle ?? this.updateDragHandle,
+      updateCardBorder: updateCardBorder ?? this.updateCardBorder,
+      updateCardShadow: updateCardShadow ?? this.updateCardShadow,
+      updateProgressTrack: updateProgressTrack ?? this.updateProgressTrack,
+      updateLogBg: updateLogBg ?? this.updateLogBg,
+    );
+  }
+
+  @override
+  AppThemeColors lerp(ThemeExtension<AppThemeColors>? other, double t) {
+    if (other is! AppThemeColors) return this;
+    return AppThemeColors(
+      mutedText: Color.lerp(mutedText, other.mutedText, t)!,
+      borderSubtle: Color.lerp(borderSubtle, other.borderSubtle, t)!,
+      softInput: Color.lerp(softInput, other.softInput, t)!,
+      settingsBg: Color.lerp(settingsBg, other.settingsBg, t)!,
+      settingsGroupBg: Color.lerp(settingsGroupBg, other.settingsGroupBg, t)!,
+      settingsOnSurface: Color.lerp(settingsOnSurface, other.settingsOnSurface, t)!,
+      glassShadow: Color.lerp(glassShadow, other.glassShadow, t)!,
+      updateBg: Color.lerp(updateBg, other.updateBg, t)!,
+      updateDetailBg: Color.lerp(updateDetailBg, other.updateDetailBg, t)!,
+      updateDetailCardBg: Color.lerp(updateDetailCardBg, other.updateDetailCardBg, t)!,
+      updateSubText: Color.lerp(updateSubText, other.updateSubText, t)!,
+      updateBodyText: Color.lerp(updateBodyText, other.updateBodyText, t)!,
+      updateDragHandle: Color.lerp(updateDragHandle, other.updateDragHandle, t)!,
+      updateCardBorder: Color.lerp(updateCardBorder, other.updateCardBorder, t)!,
+      updateCardShadow: Color.lerp(updateCardShadow, other.updateCardShadow, t)!,
+      updateProgressTrack: Color.lerp(updateProgressTrack, other.updateProgressTrack, t)!,
+      updateLogBg: Color.lerp(updateLogBg, other.updateLogBg, t)!,
+    );
+  }
+}
+
+final lightAppThemeColors = AppThemeColors(
+  mutedText: AppTheme.lightTextMuted,
+  borderSubtle: const Color(0xFFE2E8F0),
+  softInput: Colors.white.withValues(alpha: 0.82),
+  settingsBg: const Color(0xFFF2F2F7),
+  settingsGroupBg: Colors.white,
+  settingsOnSurface: const Color(0xFF1C1C1E),
+  glassShadow: Colors.black.withValues(alpha: 0.06),
+  updateBg: const Color(0xFFF7F7FA),
+  updateDetailBg: const Color(0xFFFAFAFD),
+  updateDetailCardBg: Colors.white,
+  updateSubText: Colors.black45,
+  updateBodyText: Colors.black87,
+  updateDragHandle: Colors.black26,
+  updateCardBorder: Colors.black.withValues(alpha: 0.05),
+  updateCardShadow: Colors.black.withValues(alpha: 0.08),
+  updateProgressTrack: Colors.black.withValues(alpha: 0.05),
+  updateLogBg: Colors.black.withValues(alpha: 0.04),
+);
+
+final darkAppThemeColors = AppThemeColors(
+  mutedText: AppTheme.darkTextMuted,
+  borderSubtle: Colors.white.withValues(alpha: 0.1),
+  softInput: const Color(0xFF0F172A).withValues(alpha: 0.62),
+  settingsBg: Colors.black,
+  settingsGroupBg: const Color(0xFF1C1C1E),
+  settingsOnSurface: Colors.white,
+  glassShadow: Colors.black.withValues(alpha: 0.28),
+  updateBg: Colors.black,
+  updateDetailBg: const Color(0xFF121216),
+  updateDetailCardBg: const Color(0xFF1C1C22),
+  updateSubText: Colors.white54,
+  updateBodyText: Colors.white70,
+  updateDragHandle: Colors.white24,
+  updateCardBorder: Colors.white.withValues(alpha: 0.07),
+  updateCardShadow: Colors.black.withValues(alpha: 0.45),
+  updateProgressTrack: Colors.white.withValues(alpha: 0.08),
+  updateLogBg: Colors.white.withValues(alpha: 0.06),
+);
+
+extension AppThemeColorsExt on BuildContext {
+  AppThemeColors get colors => Theme.of(this).extension<AppThemeColors>()!;
+
+  Color get mutedText => colors.mutedText;
+  Color get borderSubtle => colors.borderSubtle;
+  Color get softInput => colors.softInput;
+  Color get settingsBg => colors.settingsBg;
+  Color get settingsGroupBg => colors.settingsGroupBg;
+  Color get settingsOnSurface => colors.settingsOnSurface;
+  Color get glassShadow => colors.glassShadow;
+  Color get updateBg => colors.updateBg;
+  Color get updateDetailBg => colors.updateDetailBg;
+  Color get updateDetailCardBg => colors.updateDetailCardBg;
+  Color get updateSubText => colors.updateSubText;
+  Color get updateBodyText => colors.updateBodyText;
+  Color get updateDragHandle => colors.updateDragHandle;
+  Color get updateCardBorder => colors.updateCardBorder;
+  Color get updateCardShadow => colors.updateCardShadow;
+  Color get updateProgressTrack => colors.updateProgressTrack;
+  Color get updateLogBg => colors.updateLogBg;
 }

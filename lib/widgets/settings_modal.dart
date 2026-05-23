@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../theme.dart';
+
 import '../providers/settings_provider.dart';
 import '../services/update_service.dart';
 import 'software_update_screen.dart';
@@ -15,10 +17,8 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    // One UI background is typically completely black in dark mode
-    final bgColor = isDark ? Colors.black : const Color(0xFFF2F2F7);
-    final onSurfaceColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final bgColor = context.settingsBg;
+    final onSurfaceColor = context.settingsOnSurface;
 
     return Scaffold(
           backgroundColor: bgColor,
@@ -163,12 +163,11 @@ class _SettingGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 420),
       curve: Curves.easeOutCubic,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        color: context.settingsGroupBg,
         borderRadius: BorderRadius.circular(22),
       ),
       child: Column(
@@ -198,8 +197,7 @@ class _SettingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final onSurfaceColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final onSurfaceColor = context.settingsOnSurface;
     
     return ListTile(
       onTap: onTap,
@@ -240,8 +238,7 @@ class _SettingTile extends StatelessWidget {
 class _Divider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final onSurfaceColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final onSurfaceColor = context.settingsOnSurface;
     return Padding(
       padding: const EdgeInsets.only(left: 60, right: 16),
       child: Divider(
@@ -291,8 +288,8 @@ class ThemeSettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? Colors.black : const Color(0xFFF2F2F7);
-    final onSurfaceColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final bgColor = context.settingsBg;
+    final onSurfaceColor = context.settingsOnSurface;
 
     return Scaffold(
           backgroundColor: bgColor,
@@ -353,8 +350,8 @@ class SoundSettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? Colors.black : const Color(0xFFF2F2F7);
-    final onSurfaceColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final bgColor = context.settingsBg;
+    final onSurfaceColor = context.settingsOnSurface;
 
     return Scaffold(
           backgroundColor: bgColor,

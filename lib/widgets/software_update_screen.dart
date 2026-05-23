@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/update_service.dart';
 import 'software_update_detail_screen.dart';
+import '../theme.dart';
 
 enum UpdateState { idle, checking, upToDate, hasUpdate }
 
@@ -124,10 +125,9 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     // Background color: Pure black in dark mode, elegant off-white in light mode
-    final bgColor = isDark ? Colors.black : const Color(0xFFF7F7FA);
+    final bgColor = context.updateBg;
     
-    // Text colors
-    final textColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final textColor = context.settingsOnSurface;
 
     final systemOverlay = SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -275,7 +275,7 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                               shadows: isDark
                                   ? [
                                       Shadow(
-                                        color: Colors.black.withValues(alpha: 0.3),
+                                        color: context.updateLogBg,
                                         offset: const Offset(0, 4),
                                         blurRadius: 10,
                                       ),
@@ -298,7 +298,7 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                                 child: Text(
                                   '최신 소프트웨어입니다.',
                                   style: TextStyle(
-                                    color: isDark ? Colors.white70 : Colors.black87,
+                                    color: context.updateBodyText,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: -0.3,

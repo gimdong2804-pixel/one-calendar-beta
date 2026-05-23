@@ -1517,11 +1517,7 @@ class GlassPanel extends StatelessWidget {
         border: Border.all(color: context.borderSubtle),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(
-              alpha: Theme.of(context).brightness == Brightness.dark
-                  ? 0.28
-                  : 0.06,
-            ),
+            color: context.glassShadow,
             blurRadius: 28,
             offset: const Offset(0, 16),
           ),
