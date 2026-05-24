@@ -163,9 +163,7 @@ class _SettingGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 420),
-      curve: Curves.easeOutCubic,
+    return Container(
       decoration: BoxDecoration(
         color: context.settingsGroupBg,
         borderRadius: BorderRadius.circular(22),
