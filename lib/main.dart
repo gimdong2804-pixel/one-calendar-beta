@@ -93,16 +93,54 @@ class _OneCalendarAppState extends State<OneCalendarApp> {
       ],
       builder: (context, child) {
         final scale = MediaQuery.textScalerOf(context).scale(1);
-        final clamped = scale > 1.08 ? 1.08 : scale;
+        final clamped = scale > 1.0 ? 1.0 : scale;
         return MediaQuery(
           data: MediaQuery.of(
             context,
           ).copyWith(textScaler: TextScaler.linear(clamped)),
-          child: child ?? const SizedBox.shrink(),
+          child: _MobileDisplayScaleGuard(
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
       home: const PlannerScreen(),
       debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class _MobileDisplayScaleGuard extends StatelessWidget {
+  const _MobileDisplayScaleGuard({required this.child});
+
+  static const double _targetMobileWidth = 412;
+  static const double _minimumScale = 0.86;
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) {
+      return child;
+    }
+
+    final size = MediaQuery.sizeOf(context);
+    final shortestSide = size.shortestSide;
+    if (shortestSide >= _targetMobileWidth) {
+      return child;
+    }
+
+    final scale = (shortestSide / _targetMobileWidth).clamp(_minimumScale, 1.0);
+
+    return ClipRect(
+      child: Transform.scale(
+        scale: scale,
+        alignment: Alignment.topCenter,
+        child: SizedBox(
+          width: size.width / scale,
+          height: size.height / scale,
+          child: child,
+        ),
+      ),
     );
   }
 }
