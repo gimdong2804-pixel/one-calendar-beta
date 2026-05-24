@@ -15,7 +15,6 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<SettingsProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = context.settingsBg;
     final onSurfaceColor = context.settingsOnSurface;
@@ -123,9 +122,7 @@ class SettingsScreen extends StatelessWidget {
           _SettingGroup(
             children: [
               _SettingTile(
-                icon: settings.isSoundEnabled
-                    ? Icons.volume_up_rounded
-                    : Icons.volume_off_rounded,
+                icon: Icons.volume_up_rounded,
                 iconColor: Colors.lightBlue,
                 title: '소리',
                 onTap: () {
@@ -374,7 +371,7 @@ class SoundSettingsScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          '소리',
+          '터치음',
           style: TextStyle(fontWeight: FontWeight.w700, color: onSurfaceColor),
         ),
       ),
@@ -384,11 +381,9 @@ class SoundSettingsScreen extends StatelessWidget {
           _SettingGroup(
             children: [
               _SettingTile(
-                icon: settings.isSoundEnabled
-                    ? Icons.volume_up_rounded
-                    : Icons.volume_off_rounded,
-                iconColor: Colors.lightBlue,
-                title: '소리',
+                icon: Icons.touch_app_rounded,
+                iconColor: Colors.orangeAccent,
+                title: '터치음',
                 trailing: Switch(
                   value: settings.isSoundEnabled,
                   onChanged: (value) =>
@@ -420,7 +415,7 @@ class SoundSettingsScreen extends StatelessWidget {
                                       horizontal: 16,
                                     ),
                                     child: Text(
-                                      '소리 크기: ${(settings.soundVolume * 100).round()}%',
+                                      '터치음 크기: ${(settings.soundVolume * 100).round()}%',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         color: onSurfaceColor,

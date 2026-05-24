@@ -1,6 +1,6 @@
 {
-  "latestBuildNumber": 42,
-  "versionName": "One UI 1.0 (Beta 42)",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2042)/One%20UI%201.0%20(Beta%2042).apk",
-  "changelog": "One UI 1.0 (Beta 42) 업데이트가 완료되었습니다!\n1. 액션 바 커스텀 설정(순서 정렬, 배경 블러, 버튼 표시 토글) 기능을 성공적으로 구현하고 안정화했습니다.\n2. 액션 바 내 버튼 빌드 시 발생하던 key 관련 컴파일러 오류를 해결했습니다."
+  "latestBuildNumber": 43,
+  "versionName": "One UI 1.0 (Beta 43)",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2043).apk",
+  "changelog": "One UI 1.0 (Beta 43) 업데이트가 완료되었습니다!\n1. 설정 내 대주제를 '소리'로 유지하고, 상세 설정 항목을 '터치음'으로 구성했습니다.\n2. 불필요한 코드 경고를 제거하고 UI 일관성을 개선했습니다."
 }
