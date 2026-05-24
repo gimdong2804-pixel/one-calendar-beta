@@ -355,7 +355,9 @@ class PrioritiesCard extends StatelessWidget {
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
               child: Column(
-                key: ValueKey('compact-$title'),
+                key: ValueKey(
+                  isTodoPanel ? 'compact-todo' : 'compact-priority',
+                ),
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SectionTitle(
@@ -377,7 +379,9 @@ class PrioritiesCard extends StatelessWidget {
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 220),
                     child: Column(
-                      key: ValueKey(title),
+                      key: ValueKey(
+                        isTodoPanel ? 'desktop-todo' : 'desktop-priority',
+                      ),
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SectionTitle(
@@ -1166,7 +1170,7 @@ class _TimeBlockMobileCard extends StatelessWidget {
   final VoidCallback onDelete;
 
   @override
-    Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -1403,7 +1407,88 @@ class _ActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<SettingsProvider>();
     final planner = context.watch<PlannerProvider>();
+
+    final buttons = settings.actionBarOrder.where((id) => settings.isButtonVisible(id)).map((id) {
+      switch (id) {
+        case 'btnAIChat':
+          return _ActionButton(
+            key: const ValueKey('btnAIChat'),
+            icon: Icons.smart_toy_rounded,
+            label: 'AI 어시스턴트',
+            color: Theme.of(context).colorScheme.primary,
+            onPressed: () => _showSnack(
+              context,
+              'AI 어시스턴트 화면은 Flutter UI 이식 다음 단계에서 연결됩니다.',
+            ),
+          );
+        case 'btnToggleAI':
+          return _ActionButton(
+            key: const ValueKey('btnToggleAI'),
+            icon: Icons.auto_awesome_rounded,
+            label: 'AI가 짠 예시 보기',
+            color: Theme.of(context).colorScheme.tertiary,
+            onPressed: () {
+              context.read<PlannerProvider>().applyAiExample();
+              _showSnack(context, '예시 계획을 적용했습니다.');
+            },
+          );
+        case 'btnReset':
+          return _ActionButton(
+            key: const ValueKey('btnReset'),
+            icon: Icons.refresh_rounded,
+            label: '전체 초기화',
+            muted: true,
+            onPressed: () => _confirmClear(context),
+          );
+        case 'btnSave':
+          return _ActionButton(
+            key: const ValueKey('btnSave'),
+            icon: Icons.save_rounded,
+            label: planner.isSaving ? '자동 저장 중...' : '자동 저장 완료',
+            color: Theme.of(context).colorScheme.primary,
+            onPressed: () async {
+              await context.read<PlannerProvider>().saveNow();
+              if (context.mounted) _showSnack(context, '저장했습니다.');
+            },
+          );
+        case 'btnCloudSync':
+          return _ActionButton(
+            key: const ValueKey('btnCloudSync'),
+            icon: Icons.cloud_rounded,
+            label: '클라우드',
+            color: const Color(0xFF2563EB),
+            onPressed: () => _showSnack(
+              context,
+              '클라우드 동기화는 기존 HTML 로직 분석 후 안전하게 옮길 예정입니다.',
+            ),
+          );
+        case 'btnLoginLogout':
+          return _ActionButton(
+            key: const ValueKey('btnLoginLogout'),
+            icon: Icons.key_rounded,
+            label: '로그인 / 가입',
+            muted: true,
+            onPressed: () =>
+                _showSnack(context, '계정 연동 UI는 클라우드 단계에서 함께 연결됩니다.'),
+          );
+        case 'btnPrint':
+          return _ActionButton(
+            key: const ValueKey('btnPrint'),
+            icon: Icons.print_rounded,
+            label: 'PDF 인쇄',
+            muted: true,
+            onPressed: () => _showSnack(
+              context,
+              '인쇄 기능은 플랫폼별 출력 방식에 맞춰 다음 단계에서 연결됩니다.',
+            ),
+          );
+        default:
+          return const SizedBox.shrink();
+      }
+    }).toList();
+
     return SafeArea(
       top: false,
       child: Center(
@@ -1426,73 +1511,20 @@ class _ActionBar extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(100),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 14,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: settings.actionBarBlur / 3.0,
+                  sigmaY: settings.actionBarBlur / 3.0,
                 ),
-                child: Row(
-                  children: [
-                    _ActionButton(
-                      icon: Icons.smart_toy_rounded,
-                      label: 'AI 어시스턴트',
-                      color: Theme.of(context).colorScheme.primary,
-                      onPressed: () => _showSnack(
-                        context,
-                        'AI 어시스턴트 화면은 Flutter UI 이식 다음 단계에서 연결됩니다.',
-                      ),
-                    ),
-                    _ActionButton(
-                      icon: Icons.auto_awesome_rounded,
-                      label: 'AI가 짠 예시 보기',
-                      color: Theme.of(context).colorScheme.tertiary,
-                      onPressed: () {
-                        context.read<PlannerProvider>().applyAiExample();
-                        _showSnack(context, '예시 계획을 적용했습니다.');
-                      },
-                    ),
-                    _ActionButton(
-                      icon: Icons.refresh_rounded,
-                      label: '전체 초기화',
-                      muted: true,
-                      onPressed: () => _confirmClear(context),
-                    ),
-                    _ActionButton(
-                      icon: Icons.save_rounded,
-                      label: planner.isSaving ? '자동 저장 중...' : '자동 저장 완료',
-                      color: Theme.of(context).colorScheme.primary,
-                      onPressed: () async {
-                        await context.read<PlannerProvider>().saveNow();
-                        if (context.mounted) _showSnack(context, '저장했습니다.');
-                      },
-                    ),
-                    _ActionButton(
-                      icon: Icons.cloud_rounded,
-                      label: '클라우드',
-                      color: const Color(0xFF2563EB),
-                      onPressed: () => _showSnack(
-                        context,
-                        '클라우드 동기화는 기존 HTML 로직 분석 후 안전하게 옮길 예정입니다.',
-                      ),
-                    ),
-                    _ActionButton(
-                      icon: Icons.key_rounded,
-                      label: '로그인 / 가입',
-                      muted: true,
-                      onPressed: () =>
-                          _showSnack(context, '계정 연동 UI는 클라우드 단계에서 함께 연결됩니다.'),
-                    ),
-                    _ActionButton(
-                      icon: Icons.print_rounded,
-                      label: 'PDF 인쇄',
-                      muted: true,
-                      onPressed: () => _showSnack(
-                        context,
-                        '인쇄 기능은 플랫폼별 출력 방식에 맞춰 다음 단계에서 연결됩니다.',
-                      ),
-                    ),
-                  ],
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 14,
+                  ),
+                  child: Row(
+                    children: buttons,
+                  ),
                 ),
               ),
             ),
@@ -1978,6 +2010,7 @@ class _DateArrowButton extends StatelessWidget {
 
 class _ActionButton extends StatelessWidget {
   const _ActionButton({
+    super.key,
     required this.icon,
     required this.label,
     required this.onPressed,
