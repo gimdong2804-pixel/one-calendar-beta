@@ -1,0 +1,25 @@
+# GitHub Pages should publish only lightweight web/update metadata.
+# APK binaries are served from repository raw URLs, so copying beta/ into
+# the Pages artifact makes every deployment unnecessarily huge.
+exclude:
+  - android/
+  - assets/
+  - beta/
+  - build/
+  - ios/
+  - lib/
+  - linux/
+  - macos/
+  - test/
+  - windows/
+  - .dart_tool/
+  - .idea/
+  - .tmp.drivedownload/
+  - .tmp.driveupload/
+  - analysis_options.yaml
+  - devtools_options.yaml
+  - one_calendar.iml
+  - pubspec.lock
+  - pubspec.yaml
+  - test_matrix.dart
+  - test_matrix_values.dart

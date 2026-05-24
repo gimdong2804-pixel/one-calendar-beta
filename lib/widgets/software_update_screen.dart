@@ -39,6 +39,7 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
               route.animation!.removeStatusListener(listener);
             }
           }
+
           route.animation!.addStatusListener(listener);
         }
       } else {
@@ -81,7 +82,9 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
       return;
     }
 
-    if (info.hasUpdate) {
+    final hasUpdate = await UpdateService.isUpdateAvailable(info);
+
+    if (hasUpdate) {
       setState(() {
         _updateState = UpdateState.hasUpdate;
       });
@@ -95,43 +98,52 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
 
   /// Luxurious sliding routing transition (Right to Left)
   void _navigateToDetail(UpdateInfo info) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => SoftwareUpdateDetailScreen(updateInfo: info),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.easeInOutCubic;
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          return SlideTransition(
-            position: animation.drive(tween),
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 400),
-      ),
-    ).then((_) {
-      // Revert checking status back to idle if they back navigate, allowing subsequent check attempts
-      if (mounted && _updateState == UpdateState.hasUpdate) {
-        setState(() {
-          _updateState = UpdateState.idle;
+    Navigator.of(context)
+        .push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                SoftwareUpdateDetailScreen(updateInfo: info),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOutCubic;
+                  var tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+            transitionDuration: const Duration(milliseconds: 400),
+          ),
+        )
+        .then((_) {
+          // Revert checking status back to idle if they back navigate, allowing subsequent check attempts
+          if (mounted && _updateState == UpdateState.hasUpdate) {
+            setState(() {
+              _updateState = UpdateState.idle;
+            });
+          }
         });
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     // Background color: Pure black in dark mode, elegant off-white in light mode
     final bgColor = context.updateBg;
-    
+
     final textColor = context.settingsOnSurface;
 
     final systemOverlay = SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark, // Android
+      statusBarIconBrightness: isDark
+          ? Brightness.light
+          : Brightness.dark, // Android
       statusBarBrightness: isDark ? Brightness.dark : Brightness.light, // iOS
     );
 
@@ -174,10 +186,13 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
           child: Column(
             children: [
               const Spacer(flex: 3),
-              
+
               // Central Glowing Blob & Typography
               TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: 0.0, end: _startAnimation ? 1.0 : 0.0),
+                tween: Tween<double>(
+                  begin: 0.0,
+                  end: _startAnimation ? 1.0 : 0.0,
+                ),
                 duration: const Duration(milliseconds: 800),
                 curve: Curves.easeOutCubic,
                 builder: (context, value, child) {
@@ -210,8 +225,12 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                                   shape: BoxShape.circle,
                                   gradient: RadialGradient(
                                     colors: [
-                                      const Color(0xFF00F2FE).withValues(alpha: isDark ? 0.38 : 0.28),
-                                      const Color(0xFF00F2FE).withValues(alpha: 0.0),
+                                      const Color(
+                                        0xFF00F2FE,
+                                      ).withValues(alpha: isDark ? 0.38 : 0.28),
+                                      const Color(
+                                        0xFF00F2FE,
+                                      ).withValues(alpha: 0.0),
                                     ],
                                     stops: const [0.0, 1.0],
                                   ),
@@ -229,8 +248,12 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                                   shape: BoxShape.circle,
                                   gradient: RadialGradient(
                                     colors: [
-                                      const Color(0xFFFF8C00).withValues(alpha: isDark ? 0.35 : 0.24),
-                                      const Color(0xFFFF8C00).withValues(alpha: 0.0),
+                                      const Color(
+                                        0xFFFF8C00,
+                                      ).withValues(alpha: isDark ? 0.35 : 0.24),
+                                      const Color(
+                                        0xFFFF8C00,
+                                      ).withValues(alpha: 0.0),
                                     ],
                                     stops: const [0.0, 1.0],
                                   ),
@@ -248,8 +271,12 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                                   shape: BoxShape.circle,
                                   gradient: RadialGradient(
                                     colors: [
-                                      const Color(0xFF8A2387).withValues(alpha: isDark ? 0.30 : 0.20),
-                                      const Color(0xFF8A2387).withValues(alpha: 0.0),
+                                      const Color(
+                                        0xFF8A2387,
+                                      ).withValues(alpha: isDark ? 0.30 : 0.20),
+                                      const Color(
+                                        0xFF8A2387,
+                                      ).withValues(alpha: 0.0),
                                     ],
                                     stops: const [0.0, 1.0],
                                   ),
@@ -259,7 +286,7 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                           ],
                         ),
                       ),
-                      
+
                       // Text overlaid exactly in the center
                       Column(
                         mainAxisSize: MainAxisSize.min,
@@ -283,14 +310,18 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                                   : [],
                             ),
                           ),
-                          
+
                           // Scenario A: Conditional fade-in text '최신 소프트웨어입니다.'
                           AnimatedOpacity(
-                            opacity: _updateState == UpdateState.upToDate ? 1.0 : 0.0,
+                            opacity: _updateState == UpdateState.upToDate
+                                ? 1.0
+                                : 0.0,
                             duration: const Duration(milliseconds: 600),
                             curve: Curves.easeInOutCubic,
                             child: AnimatedSlide(
-                              offset: _updateState == UpdateState.upToDate ? Offset.zero : const Offset(0, 0.4),
+                              offset: _updateState == UpdateState.upToDate
+                                  ? Offset.zero
+                                  : const Offset(0, 0.4),
                               duration: const Duration(milliseconds: 600),
                               curve: Curves.easeOutCubic,
                               child: Padding(
@@ -313,9 +344,9 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                   ),
                 ),
               ),
-              
+
               const Spacer(flex: 4),
-              
+
               // Bottom Check for Updates Pill Button (Animated out if already up to date)
               AnimatedOpacity(
                 opacity: _updateState == UpdateState.upToDate ? 0.0 : 1.0,
@@ -328,9 +359,16 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                   child: IgnorePointer(
                     ignoring: _updateState == UpdateState.upToDate,
                     child: TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0.0, end: _startAnimation ? 1.0 : 0.0),
+                      tween: Tween<double>(
+                        begin: 0.0,
+                        end: _startAnimation ? 1.0 : 0.0,
+                      ),
                       duration: const Duration(milliseconds: 600),
-                      curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
+                      curve: const Interval(
+                        0.2,
+                        1.0,
+                        curve: Curves.easeOutCubic,
+                      ),
                       builder: (context, value, child) {
                         return Opacity(
                           opacity: value,
@@ -351,12 +389,17 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
                                   ? null
                                   : () => _handleUpdateCheck(),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF2A7DFC), // Samsung Premium Blue
+                                backgroundColor: const Color(
+                                  0xFF2A7DFC,
+                                ), // Samsung Premium Blue
                                 foregroundColor: Colors.white,
-                                disabledBackgroundColor: const Color(0xFF2A7DFC), // Maintain background color during loading
+                                disabledBackgroundColor: const Color(
+                                  0xFF2A7DFC,
+                                ), // Maintain background color during loading
                                 elevation: 0,
                                 shadowColor: Colors.transparent,
-                                shape: const StadiumBorder(), // Perfectly rounded pill shape
+                                shape:
+                                    const StadiumBorder(), // Perfectly rounded pill shape
                               ),
                               child: _updateState == UpdateState.checking
                                   ? const OneUIRotatingDots()
@@ -392,7 +435,8 @@ class OneUIRotatingDots extends StatefulWidget {
   State<OneUIRotatingDots> createState() => _OneUIRotatingDotsState();
 }
 
-class _OneUIRotatingDotsState extends State<OneUIRotatingDots> with SingleTickerProviderStateMixin {
+class _OneUIRotatingDotsState extends State<OneUIRotatingDots>
+    with SingleTickerProviderStateMixin {
   late AnimationController _rotationController;
 
   @override
@@ -421,25 +465,13 @@ class _OneUIRotatingDotsState extends State<OneUIRotatingDots> with SingleTicker
           alignment: Alignment.center,
           children: [
             // Top Dot
-            Positioned(
-              top: 0,
-              child: _buildDot(),
-            ),
+            Positioned(top: 0, child: _buildDot()),
             // Bottom Dot
-            Positioned(
-              bottom: 0,
-              child: _buildDot(),
-            ),
+            Positioned(bottom: 0, child: _buildDot()),
             // Left Dot
-            Positioned(
-              left: 0,
-              child: _buildDot(),
-            ),
+            Positioned(left: 0, child: _buildDot()),
             // Right Dot
-            Positioned(
-              right: 0,
-              child: _buildDot(),
-            ),
+            Positioned(right: 0, child: _buildDot()),
           ],
         ),
       ),
@@ -457,4 +489,3 @@ class _OneUIRotatingDotsState extends State<OneUIRotatingDots> with SingleTicker
     );
   }
 }
-

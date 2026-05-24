@@ -4,50 +4,87 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-/// 현재 앱의 빌드 번호 (pubspec.yaml의 +N 부분과 일치시켜야 함)
-const int currentBuildNumber = 42;
-const String currentVersionName = 'One UI 1.0 (Beta 43)';
+const int fallbackCurrentBuildNumber = 44;
+const String currentVersionName = 'One UI 1.0 (Beta 44)';
 
-/// GitHub raw URL에서 update_info.json 읽기
 const String _updateInfoUrl =
     'https://raw.githubusercontent.com/gimdong2804-pixel/one-calendar-beta/main/update_info.json';
+
+const String _downloadedBuildKey = 'downloaded_update_build';
+const String _downloadedUrlKey = 'downloaded_update_url';
+const String _downloadedPathKey = 'downloaded_update_path';
+
+class CurrentAppVersion {
+  const CurrentAppVersion({
+    required this.buildNumber,
+    required this.versionName,
+  });
+
+  final int buildNumber;
+  final String versionName;
+}
 
 class UpdateInfo {
   final int latestBuildNumber;
   final String versionName;
   final String downloadUrl;
   final String changelog;
+  final DateTime? releasedAt;
 
   const UpdateInfo({
     required this.latestBuildNumber,
     required this.versionName,
     required this.downloadUrl,
     required this.changelog,
+    this.releasedAt,
   });
 
   factory UpdateInfo.fromJson(Map<String, dynamic> json) {
     return UpdateInfo(
-      latestBuildNumber: json['latestBuildNumber'] as int,
+      latestBuildNumber: _readInt(json['latestBuildNumber']),
       versionName: json['versionName'] as String,
       downloadUrl: json['downloadUrl'] as String,
       changelog: json['changelog'] as String? ?? '',
+      releasedAt: _readDateTime(json['releasedAt']),
     );
   }
-
-  bool get hasUpdate => latestBuildNumber > currentBuildNumber;
 }
 
 class UpdateService {
-  /// 서버에서 최신 버전 정보 가져오기
+  static Future<CurrentAppVersion> getCurrentAppVersion() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final buildNumber =
+          int.tryParse(packageInfo.buildNumber) ?? fallbackCurrentBuildNumber;
+      return CurrentAppVersion(
+        buildNumber: buildNumber,
+        versionName: _versionNameForBuild(buildNumber),
+      );
+    } catch (e) {
+      debugPrint('현재 앱 버전 확인 실패: $e');
+      return const CurrentAppVersion(
+        buildNumber: fallbackCurrentBuildNumber,
+        versionName: currentVersionName,
+      );
+    }
+  }
+
+  static Future<bool> isUpdateAvailable(UpdateInfo info) async {
+    final current = await getCurrentAppVersion();
+    return info.latestBuildNumber > current.buildNumber;
+  }
+
   static Future<UpdateInfo?> checkForUpdate() async {
     try {
       final client = HttpClient();
       client.connectionTimeout = const Duration(seconds: 5);
-      
-      // 캐시 방지를 위해 타임스탬프 쿼리 매개변수 추가 (GitHub CDN 및 로컬 디바이스 캐시 우회)
-      final preventCacheUrl = '$_updateInfoUrl?t=${DateTime.now().millisecondsSinceEpoch}';
+
+      final preventCacheUrl =
+          '$_updateInfoUrl?t=${DateTime.now().millisecondsSinceEpoch}';
       final request = await client.getUrl(Uri.parse(preventCacheUrl));
       final response = await request.close().timeout(
         const Duration(seconds: 5),
@@ -65,12 +102,9 @@ class UpdateService {
     }
   }
 
-  /// 업데이트 확인 후 다이얼로그 표시
   static Future<void> checkAndShowDialog(BuildContext context) async {
-    // SettingsModal이 닫히면서 context가 unmounted 되는 것을 방지하기 위해 최상단 Navigator의 context를 가져옵니다.
     final rootContext = Navigator.of(context, rootNavigator: true).context;
 
-    // 로딩 표시
     if (!rootContext.mounted) return;
     showDialog(
       context: rootContext,
@@ -88,9 +122,10 @@ class UpdateService {
     );
 
     final info = await checkForUpdate();
+    final current = await getCurrentAppVersion();
 
     if (!rootContext.mounted) return;
-    Navigator.of(rootContext, rootNavigator: true).pop(); // 로딩 닫기
+    Navigator.of(rootContext, rootNavigator: true).pop();
 
     if (info == null) {
       if (!rootContext.mounted) return;
@@ -105,14 +140,14 @@ class UpdateService {
       return;
     }
 
-    if (!info.hasUpdate) {
+    if (info.latestBuildNumber <= current.buildNumber) {
       if (!rootContext.mounted) return;
       showDialog(
         context: rootContext,
         builder: (_) => AlertDialog(
           icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
-          title: const Text('최신 버전입니다'),
-          content: Text('현재 버전: $currentVersionName'),
+          title: const Text('최신 소프트웨어입니다.'),
+          content: Text('현재 버전: ${current.versionName}'),
           actions: [
             FilledButton(
               onPressed: () => Navigator.of(rootContext).pop(),
@@ -124,7 +159,6 @@ class UpdateService {
       return;
     }
 
-    // 업데이트 있음!
     if (!rootContext.mounted) return;
     showDialog(
       context: rootContext,
@@ -134,12 +168,12 @@ class UpdateService {
           color: Color(0xFF4F46E5),
           size: 48,
         ),
-        title: const Text('새 업데이트가 있습니다!'),
+        title: const Text('새 업데이트가 있습니다.'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _UpdateRow(label: '현재 버전', value: currentVersionName),
+            _UpdateRow(label: '현재 버전', value: current.versionName),
             const SizedBox(height: 8),
             _UpdateRow(label: '최신 버전', value: info.versionName),
             if (info.changelog.isNotEmpty) ...[
@@ -161,11 +195,7 @@ class UpdateService {
           FilledButton.icon(
             onPressed: () {
               Navigator.of(rootContext).pop();
-              downloadAndInstall(
-                rootContext,
-                info.downloadUrl,
-                info.versionName,
-              );
+              downloadAndInstall(rootContext, info);
             },
             icon: const Icon(Icons.download),
             label: const Text('업데이트'),
@@ -175,20 +205,115 @@ class UpdateService {
     );
   }
 
-  /// APK를 인앱으로 다운로드하고 자동으로 설치 화면을 띄움
+  static Future<File?> getPreparedInstaller(UpdateInfo info) async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedBuild = prefs.getInt(_downloadedBuildKey);
+    final savedUrl = prefs.getString(_downloadedUrlKey);
+    final savedPath = prefs.getString(_downloadedPathKey);
+
+    if (savedBuild != info.latestBuildNumber ||
+        savedUrl != info.downloadUrl ||
+        savedPath == null) {
+      return null;
+    }
+
+    final file = File(savedPath);
+    if (await file.exists() && await file.length() > 0) {
+      return file;
+    }
+
+    await clearPreparedInstaller();
+    return null;
+  }
+
+  static Future<void> clearPreparedInstaller() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_downloadedBuildKey);
+    await prefs.remove(_downloadedUrlKey);
+    await prefs.remove(_downloadedPathKey);
+  }
+
+  static Future<void> downloadUpdateInstaller({
+    required UpdateInfo updateInfo,
+    required void Function(double progress, String statusText) onProgress,
+  }) async {
+    final cachedInstaller = await getPreparedInstaller(updateInfo);
+    if (cachedInstaller != null) {
+      onProgress(1.0, '설치 준비 완료');
+      return;
+    }
+
+    final file = await _installerFileFor(updateInfo);
+    if (await file.exists()) {
+      await file.delete();
+    }
+    await clearPreparedInstaller();
+
+    onProgress(0.0, '다운로드 준비 중...');
+
+    try {
+      final dio = Dio();
+      await dio.download(
+        updateInfo.downloadUrl,
+        file.path,
+        deleteOnError: true,
+        onReceiveProgress: (received, total) {
+          if (total > 0) {
+            final value = received / total;
+            final receivedMB = (received / 1024 / 1024).toStringAsFixed(1);
+            final totalMB = (total / 1024 / 1024).toStringAsFixed(1);
+            onProgress(value, '$receivedMB MB / $totalMB MB');
+          }
+        },
+      );
+
+      if (!await file.exists() || await file.length() == 0) {
+        throw const FileSystemException('다운로드된 APK 파일이 비어 있습니다.');
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_downloadedBuildKey, updateInfo.latestBuildNumber);
+      await prefs.setString(_downloadedUrlKey, updateInfo.downloadUrl);
+      await prefs.setString(_downloadedPathKey, file.path);
+
+      onProgress(1.0, '설치 준비 완료');
+    } catch (_) {
+      if (await file.exists()) {
+        await file.delete();
+      }
+      await clearPreparedInstaller();
+      rethrow;
+    }
+  }
+
+  static Future<String?> openPreparedInstaller(UpdateInfo info) async {
+    final file = await getPreparedInstaller(info);
+    if (file == null) {
+      return '설치 파일을 찾을 수 없습니다. 다시 다운로드해주세요.';
+    }
+
+    final result = await OpenFilex.open(
+      file.path,
+      type: 'application/vnd.android.package-archive',
+    );
+
+    if (result.type != ResultType.done) {
+      return result.message.isEmpty ? '설치 화면을 열 수 없습니다.' : result.message;
+    }
+
+    return null;
+  }
+
   static Future<void> downloadAndInstall(
     BuildContext context,
-    String url,
-    String versionName,
+    UpdateInfo info,
   ) async {
-    // 진행률 표시용 ValueNotifier
     final progress = ValueNotifier<double>(0.0);
     final statusText = ValueNotifier<String>('다운로드 준비 중...');
 
     final rootContext = Navigator.of(context, rootNavigator: true).context;
     if (!rootContext.mounted) return;
 
-    // 다운로드 진행 다이얼로그
     showDialog(
       context: rootContext,
       barrierDismissible: false,
@@ -242,60 +367,30 @@ class UpdateService {
     );
 
     try {
-      // 캐시 디렉토리에 APK 저장
-      final dir = await getTemporaryDirectory();
-      final filePath = '${dir.path}/OneCalendar-update.apk';
-
-      // 기존 파일이 있으면 삭제
-      final file = File(filePath);
-      if (await file.exists()) {
-        await file.delete();
-      }
-
-      statusText.value = '서버에서 다운로드 중...';
-
-      final dio = Dio();
-      await dio.download(
-        url,
-        filePath,
-        onReceiveProgress: (received, total) {
-          if (total > 0) {
-            progress.value = received / total;
-            final receivedMB = (received / 1024 / 1024).toStringAsFixed(1);
-            final totalMB = (total / 1024 / 1024).toStringAsFixed(1);
-            statusText.value = '$receivedMB MB / $totalMB MB';
-          }
+      await downloadUpdateInstaller(
+        updateInfo: info,
+        onProgress: (value, status) {
+          progress.value = value;
+          statusText.value = status;
         },
       );
 
-      // 다운로드 완료
-      statusText.value = '설치 준비 중...';
-      progress.value = 1.0;
-
-      // 다이얼로그 닫기
       if (rootContext.mounted) {
         Navigator.of(rootContext, rootNavigator: true).pop();
       }
 
-      // APK 설치 화면 열기
-      final result = await OpenFilex.open(
-        filePath,
-        type: 'application/vnd.android.package-archive',
-      );
-
-      if (result.type != ResultType.done) {
-        if (!rootContext.mounted) return;
+      final error = await openPreparedInstaller(info);
+      if (error != null && rootContext.mounted) {
         ScaffoldMessenger.of(rootContext)
           ..clearSnackBars()
           ..showSnackBar(
             SnackBar(
-              content: Text('설치를 열 수 없습니다: ${result.message}'),
+              content: Text('설치를 시작할 수 없습니다: $error'),
               behavior: SnackBarBehavior.floating,
             ),
           );
       }
     } catch (e) {
-      // 다이얼로그 닫기
       if (rootContext.mounted) {
         Navigator.of(rootContext, rootNavigator: true).pop();
       }
@@ -315,59 +410,30 @@ class UpdateService {
     }
   }
 
-  /// APK를 인앱으로 다운로드하고 진행률을 콜백으로 전달하며 완료 시 자동으로 설치 화면을 띄움
-  static Future<void> downloadAndInstallWithCallback({
-    required BuildContext context,
-    required String url,
-    required String versionName,
-    required void Function(double progress, String statusText) onProgress,
-    required void Function(String error) onError,
-    required void Function() onComplete,
-  }) async {
-    try {
-      // 캐시 디렉토리에 APK 저장
-      final dir = await getTemporaryDirectory();
-      final filePath = '${dir.path}/OneCalendar-update.apk';
-
-      // 기존 파일이 있으면 삭제
-      final file = File(filePath);
-      if (await file.exists()) {
-        await file.delete();
-      }
-
-      onProgress(0.0, '다운로드 준비 중...');
-
-      final dio = Dio();
-      await dio.download(
-        url,
-        filePath,
-        onReceiveProgress: (received, total) {
-          if (total > 0) {
-            final val = received / total;
-            final receivedMB = (received / 1024 / 1024).toStringAsFixed(1);
-            final totalMB = (total / 1024 / 1024).toStringAsFixed(1);
-            onProgress(val, '$receivedMB MB / $totalMB MB');
-          }
-        },
-      );
-
-      // 다운로드 완료
-      onProgress(1.0, '설치 준비 중...');
-      onComplete();
-
-      // APK 설치 화면 열기
-      final result = await OpenFilex.open(
-        filePath,
-        type: 'application/vnd.android.package-archive',
-      );
-
-      if (result.type != ResultType.done) {
-        onError('설치를 열 수 없습니다: ${result.message}');
-      }
-    } catch (e) {
-      onError('다운로드 실패: $e');
+  static Future<File> _installerFileFor(UpdateInfo info) async {
+    final dir = await getApplicationSupportDirectory();
+    final updatesDir = Directory('${dir.path}${Platform.pathSeparator}updates');
+    if (!await updatesDir.exists()) {
+      await updatesDir.create(recursive: true);
     }
+    return File(
+      '${updatesDir.path}${Platform.pathSeparator}one_calendar_update_${info.latestBuildNumber}.apk',
+    );
   }
+
+  static String _versionNameForBuild(int buildNumber) {
+    return 'One UI 1.0 (Beta $buildNumber)';
+  }
+}
+
+int _readInt(Object? value) {
+  if (value is int) return value;
+  return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
+DateTime? _readDateTime(Object? value) {
+  if (value == null) return null;
+  return DateTime.tryParse(value.toString());
 }
 
 class _UpdateRow extends StatelessWidget {

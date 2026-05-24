@@ -89,12 +89,16 @@ Future<void> _performUpdateCheckFlow(ServiceInstance? service) async {
       return;
     }
 
-    debugPrint('[백그라운드 서비스] 조회 완료: 최신 빌드(${info.latestBuildNumber}), 현재 빌드($currentBuildNumber)');
+    final current = await UpdateService.getCurrentAppVersion();
+    debugPrint(
+      '[백그라운드 서비스] 조회 완료: 최신 빌드(${info.latestBuildNumber}), 현재 빌드(${current.buildNumber})',
+    );
 
     // 포그라운드 고정 알림 텍스트 갱신 (사용자가 확인 중임을 명시적으로 인지할 수 있도록 서포트)
     if (service is AndroidServiceInstance) {
       final now = DateTime.now();
-      final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+      final timeStr =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
       service.setForegroundNotificationInfo(
         title: 'One Calendar 업데이트 모니터링',
         content: '마지막 확인 시간: $timeStr (최신 버전 상태)',
@@ -102,7 +106,7 @@ Future<void> _performUpdateCheckFlow(ServiceInstance? service) async {
     }
 
     // 신규 업데이트 감지
-    if (info.hasUpdate) {
+    if (info.latestBuildNumber > current.buildNumber) {
       final prefs = await SharedPreferences.getInstance();
       final lastNotifiedBuild = prefs.getInt('last_notified_build') ?? 0;
 
@@ -137,8 +141,9 @@ Future<void> _showUpdatePushNotification(UpdateInfo info) async {
   try {
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidSettings);
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidSettings,
+    );
     await BackgroundUpdateService.notificationsPlugin.initialize(initSettings);
   } catch (e) {
     debugPrint('[백그라운드 서비스] 푸시 발송 전 알림 플러그인 강제 초기화 에러: $e');
@@ -156,7 +161,9 @@ Future<void> _showUpdatePushNotification(UpdateInfo info) async {
     styleInformation: BigTextStyleInformation(''), // 긴 텍스트 체인지로그 대응
   );
 
-  const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+  const NotificationDetails platformDetails = NotificationDetails(
+    android: androidDetails,
+  );
 
   final String changelogSnippet = info.changelog.length > 80
       ? '${info.changelog.substring(0, 80)}...'
@@ -179,7 +186,7 @@ Future<void> _showUpdatePushNotification(UpdateInfo info) async {
 class BackgroundUpdateService {
   static const String notificationChannelId = 'update_notification_channel';
   static const String foregroundChannelId = 'update_monitor_foreground_channel';
-  
+
   static final FlutterLocalNotificationsPlugin notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -190,8 +197,9 @@ class BackgroundUpdateService {
     // 1. 알림 플러그인 초기화 우선 수행
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidSettings);
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidSettings,
+    );
 
     await notificationsPlugin.initialize(
       initSettings,
@@ -210,29 +218,33 @@ class BackgroundUpdateService {
       enableVibration: true,
     );
 
-    const AndroidNotificationChannel foregroundChannel = AndroidNotificationChannel(
-      foregroundChannelId,
-      '실시간 업데이트 확인 서비스',
-      description: '백그라운드에서 소프트웨어 업데이트를 감지하기 위해 실행 중인 상태를 표시합니다.',
-      importance: Importance.low, // 무음 형태로 상주하도록 설정
-    );
+    const AndroidNotificationChannel foregroundChannel =
+        AndroidNotificationChannel(
+          foregroundChannelId,
+          '실시간 업데이트 확인 서비스',
+          description: '백그라운드에서 소프트웨어 업데이트를 감지하기 위해 실행 중인 상태를 표시합니다.',
+          importance: Importance.low, // 무음 형태로 상주하도록 설정
+        );
 
     // 알림 채널 등록
     await notificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(updateChannel);
 
     await notificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(foregroundChannel);
 
     // 3. Android 13+ 알림 권한 요청
     if (Platform.isAndroid) {
       await notificationsPlugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.requestNotificationsPermission();
     }
 

@@ -1,31 +1,51 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../theme.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/settings_provider.dart';
 import '../services/update_service.dart';
+import '../theme.dart';
 
 enum DownloadState { idle, downloading, completed, error }
 
 class SoftwareUpdateDetailScreen extends StatefulWidget {
   final UpdateInfo updateInfo;
 
-  const SoftwareUpdateDetailScreen({
-    super.key,
-    required this.updateInfo,
-  });
+  const SoftwareUpdateDetailScreen({super.key, required this.updateInfo});
 
   @override
-  State<SoftwareUpdateDetailScreen> createState() => _SoftwareUpdateDetailScreenState();
+  State<SoftwareUpdateDetailScreen> createState() =>
+      _SoftwareUpdateDetailScreenState();
 }
 
-class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen> {
+class _SoftwareUpdateDetailScreenState
+    extends State<SoftwareUpdateDetailScreen> {
   DownloadState _downloadState = DownloadState.idle;
   double _downloadProgress = 0.0;
   String _statusText = '';
 
-  void _startDownload() {
+  @override
+  void initState() {
+    super.initState();
+    _restorePreparedInstaller();
+  }
+
+  Future<void> _restorePreparedInstaller() async {
+    final installer = await UpdateService.getPreparedInstaller(
+      widget.updateInfo,
+    );
+    if (!mounted || installer == null) return;
+
+    setState(() {
+      _downloadState = DownloadState.completed;
+      _downloadProgress = 1.0;
+      _statusText = '설치 준비 완료';
+    });
+  }
+
+  Future<void> _startDownload() async {
     if (_downloadState == DownloadState.downloading) return;
 
     setState(() {
@@ -34,70 +54,95 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
       _statusText = '다운로드 준비 중...';
     });
 
-    UpdateService.downloadAndInstallWithCallback(
-      context: context,
-      url: widget.updateInfo.downloadUrl,
-      versionName: widget.updateInfo.versionName,
-      onProgress: (progress, status) {
-        if (mounted) {
+    try {
+      await UpdateService.downloadUpdateInstaller(
+        updateInfo: widget.updateInfo,
+        onProgress: (progress, status) {
+          if (!mounted) return;
           setState(() {
             _downloadProgress = progress;
             _statusText = status;
           });
-        }
-      },
-      onError: (err) {
-        if (mounted) {
-          setState(() {
-            _downloadState = DownloadState.error;
-            _statusText = err;
-          });
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(err),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: const Color(0xFFE53935),
-              ),
-            );
-        }
-      },
-      onComplete: () {
-        if (mounted) {
-          setState(() {
-            _downloadState = DownloadState.completed;
-            _downloadProgress = 1.0;
-            _statusText = '설치 준비 완료';
-          });
-        }
-      },
-    );
+        },
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _downloadState = DownloadState.completed;
+        _downloadProgress = 1.0;
+        _statusText = '설치 준비 완료';
+      });
+    } catch (e) {
+      if (!mounted) return;
+      final message = '다운로드 실패: $e';
+      setState(() {
+        _downloadState = DownloadState.error;
+        _statusText = message;
+      });
+      _showError(message);
+    }
+  }
+
+  Future<void> _installPreparedUpdate() async {
+    final error = await UpdateService.openPreparedInstaller(widget.updateInfo);
+    if (!mounted || error == null) return;
+
+    setState(() {
+      _downloadState = DownloadState.error;
+      _statusText = error;
+    });
+    _showError(error);
+  }
+
+  void _handleButtonTap() {
+    switch (_downloadState) {
+      case DownloadState.idle:
+      case DownloadState.error:
+        _startDownload();
+        break;
+      case DownloadState.completed:
+        _installPreparedUpdate();
+        break;
+      case DownloadState.downloading:
+        break;
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: const Color(0xFFE53935),
+        ),
+      );
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Modern One UI colors
     final bgColor = context.updateDetailBg;
-    final cardBgColor = context.updateDetailCardBg;
     final textColor = context.settingsOnSurface;
     final subTextColor = context.updateSubText;
     final bodyTextColor = context.updateBodyText;
     final dragHandleColor = context.updateDragHandle;
-    final cardBorderColor = context.updateCardBorder;
+    final topPadding = MediaQuery.of(context).padding.top;
 
-    // Transparent system bar style tailored dynamically for current theme
     final systemOverlay = SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
       systemNavigationBarColor: bgColor,
-      systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      systemNavigationBarIconBrightness: isDark
+          ? Brightness.light
+          : Brightness.dark,
     );
 
     final screenHeight = MediaQuery.of(context).size.height;
+    final changes = _changelogItems();
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: systemOverlay,
@@ -105,7 +150,6 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
         backgroundColor: isDark ? Colors.black : const Color(0xFFF7F7FA),
         body: Stack(
           children: [
-            // 1. Top Wallpaper Hero Area (Fixed Background)
             Positioned(
               top: 0,
               left: 0,
@@ -135,7 +179,6 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                           color: Colors.white,
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: -1.0,
                         ),
                       ),
                     ),
@@ -143,8 +186,6 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                 },
               ),
             ),
-
-            // 2. Sliding/Scrollable Detail Card
             Positioned.fill(
               child: DraggableScrollableSheet(
                 initialChildSize: 0.60,
@@ -157,20 +198,19 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                     decoration: BoxDecoration(
                       color: bgColor,
                       borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(32), // High roundness matching premium Samsung cards
+                        top: Radius.circular(32),
                       ),
                       boxShadow: [
                         BoxShadow(
                           color: context.updateCardShadow,
                           blurRadius: 15,
                           offset: const Offset(0, -5),
-                        )
+                        ),
                       ],
                     ),
                     child: Column(
                       children: [
-                        // Smooth drag/accent line indicator at the top
-                        const SizedBox(height: 12),
+                        SizedBox(height: topPadding + 12),
                         Container(
                           width: 44,
                           height: 4,
@@ -180,110 +220,57 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                           ),
                         ),
                         const SizedBox(height: 20),
-
-                        // Scrollable changelog body
                         Expanded(
                           child: ListView(
                             controller: scrollController,
                             padding: const EdgeInsets.symmetric(horizontal: 24),
-                            physics: const ClampingScrollPhysics(), // Native buttery scroll physics
+                            physics: const ClampingScrollPhysics(),
                             children: [
                               Text(
-                                '마지막으로 완료된 업데이트',
+                                '업데이트 있음',
                                 style: TextStyle(
                                   color: textColor,
-                                  fontSize: 24,
+                                  fontSize: 26,
                                   fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.8,
+                                  letterSpacing: 0,
                                 ),
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                '2026년 5월 18일 오후 5:15',
+                                _formatReleaseTime(
+                                  widget.updateInfo.releasedAt,
+                                ),
                                 style: TextStyle(
                                   color: subTextColor,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
+                                  letterSpacing: 0,
                                 ),
                               ),
                               const SizedBox(height: 28),
-
-                              // Main Letter / Announcement text
                               Text(
-                                '안녕하세요!\nOne UI 베타 프로그램 운영팀입니다.\n\n'
-                                'One UI 베타에 적극 참여해 주셔서 진심으로 감사드립니다.\n'
-                                '정식버전 발행과 함께, 베타 테스트가 종료되었습니다.\n\n'
-                                '베타 테스트 종료 이후에는,\n'
-                                ' - 새로운 베타 버전을 배포하지 않습니다.\n'
-                                ' - 베타 모델 및 베타 앱과 관련된 공식적인 답변을 더 이상 드리지 않습니다.\n'
-                                ' - 베타 오류에 대한 피드백이 중단됩니다.\n'
-                                ' - 베타 커뮤니티를 포함한 베타 상세페이지 메뉴에 접근하실 수 없습니다.\n\n'
-                                '정식버전으로 업데이트를 하지 않으시면, 이후에 진행되는 모든 업데이트를 받으실 수 없으니, 반드시 정식버전으로 업데이트 부탁드립니다.',
+                                widget.updateInfo.versionName,
                                 style: TextStyle(
-                                  color: bodyTextColor,
-                                  fontSize: 14,
-                                  height: 1.6,
-                                  letterSpacing: -0.3,
+                                  color: textColor,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.35,
+                                  letterSpacing: 0,
                                 ),
                               ),
-                              
-                              const SizedBox(height: 24),
-                              
-                              // Real Changelog block if present in server data
-                              if (widget.updateInfo.changelog.isNotEmpty) ...[
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(20),
-                                  decoration: BoxDecoration(
-                                    color: cardBgColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: cardBorderColor),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          const Icon(Icons.system_update_alt_rounded, color: Color(0xFF2A7DFC), size: 20),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            '새로운 업데이트 상세 내용',
-                                            style: TextStyle(
-                                              color: textColor,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        widget.updateInfo.changelog,
-                                        style: TextStyle(
-                                          color: bodyTextColor,
-                                          fontSize: 13,
-                                          height: 1.5,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        '버전: ${widget.updateInfo.versionName}',
-                                        style: const TextStyle(
-                                          color: Color(0xFF2A7DFC),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
+                              const SizedBox(height: 14),
+                              for (final item in changes)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: _ChangeLine(
+                                    text: item,
+                                    color: bodyTextColor,
                                   ),
                                 ),
-                                const SizedBox(height: 40),
-                              ],
+                              const SizedBox(height: 40),
                             ],
                           ),
                         ),
-
-                        // Elegant Bottom Button / Progress Bar Section
                         Container(
                           padding: EdgeInsets.only(
                             left: 24,
@@ -300,7 +287,7 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                               ),
                             ),
                           ),
-                          child: _buildProgressButton(isDark),
+                          child: _buildProgressButton(),
                         ),
                       ],
                     ),
@@ -308,8 +295,6 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
                 },
               ),
             ),
-
-            // 3. Floating Premium Acrylic Back Button (Over the Wallpaper)
             Positioned(
               top: MediaQuery.of(context).padding.top + 12,
               left: 16,
@@ -340,27 +325,17 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
     );
   }
 
-  /// Builds the premium transforming inline progress button
-  Widget _buildProgressButton(bool isDark) {
-    final hasActiveProgress = _downloadState == DownloadState.downloading;
-    
-    // Core button sizes
+  Widget _buildProgressButton() {
+    final isDownloading = _downloadState == DownloadState.downloading;
     const double buttonHeight = 56;
-
-    // Colors
     const Color activeBlue = Color(0xFF2A7DFC);
     final Color progressTrackColor = context.updateProgressTrack;
-
-    // On press handler
-    final VoidCallback? onPressed = (_downloadState == DownloadState.idle || _downloadState == DownloadState.error)
-        ? _startDownload
-        : null;
 
     return Container(
       width: double.infinity,
       height: buttonHeight,
       decoration: BoxDecoration(
-        color: hasActiveProgress ? progressTrackColor : activeBlue,
+        color: isDownloading ? progressTrackColor : activeBlue,
         borderRadius: BorderRadius.circular(buttonHeight / 2),
       ),
       child: ClipRRect(
@@ -368,33 +343,34 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onPressed,
+            onTap: isDownloading ? null : _handleButtonTap,
             highlightColor: Colors.white10,
             splashColor: Colors.white.withValues(alpha: 0.15),
             enableFeedback: context.watch<SettingsProvider>().isSoundEnabled,
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // 1. Moving progress background filler
-                if (hasActiveProgress)
+                if (isDownloading)
                   Positioned.fill(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
-                        curve: Curves.easeOut,
-                        width: MediaQuery.of(context).size.width * _downloadProgress,
-                        color: activeBlue,
-                      ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Align(
+                          alignment: Alignment.centerLeft,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            curve: Curves.easeOut,
+                            width: constraints.maxWidth * _downloadProgress,
+                            color: activeBlue,
+                          ),
+                        );
+                      },
                     ),
                   ),
-
-                // 2. Button Central Overlay Text
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    child: _buildButtonTextContent(isDark),
+                    child: _buildButtonTextContent(),
                   ),
                 ),
               ],
@@ -405,55 +381,100 @@ class _SoftwareUpdateDetailScreenState extends State<SoftwareUpdateDetailScreen>
     );
   }
 
-  /// Returns the appropriate text style and content depending on the current download state
-  Widget _buildButtonTextContent(bool isDark) {
+  Widget _buildButtonTextContent() {
     switch (_downloadState) {
       case DownloadState.idle:
-        return const Text(
-          '다운로드 및 설치',
-          key: ValueKey('idle'),
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: -0.3,
-          ),
-        );
+        return const _ButtonText(key: ValueKey('idle'), text: '다운로드 및 설치');
       case DownloadState.downloading:
-        return Text(
-          '다운로드 중... ${(_downloadProgress * 100).toStringAsFixed(0)}% ($_statusText)',
+        return _ButtonText(
           key: const ValueKey('downloading'),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.3,
-          ),
+          text:
+              '다운로드 중... ${(_downloadProgress * 100).toStringAsFixed(0)}% ($_statusText)',
+          fontSize: 14,
         );
       case DownloadState.completed:
-        return const Text(
-          '설치 준비 완료',
-          key: ValueKey('completed'),
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: -0.3,
-          ),
-        );
+        return const _ButtonText(key: ValueKey('completed'), text: '설치 준비 완료');
       case DownloadState.error:
-        return const Text(
-          '다시 시도 (오류 발생)',
-          key: ValueKey('error'),
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: -0.3,
-          ),
-        );
+        return const _ButtonText(key: ValueKey('error'), text: '다시 시도');
     }
   }
+
+  List<String> _changelogItems() {
+    final items = widget.updateInfo.changelog
+        .split(RegExp(r'\r?\n'))
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .toList();
+
+    if (items.isNotEmpty) return items;
+    return const ['업데이트 안정성을 개선했습니다.'];
+  }
+}
+
+class _ChangeLine extends StatelessWidget {
+  const _ChangeLine({required this.text, required this.color});
+
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '- ',
+          style: TextStyle(
+            color: color,
+            fontSize: 15,
+            height: 1.55,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: color,
+              fontSize: 15,
+              height: 1.55,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ButtonText extends StatelessWidget {
+  const _ButtonText({super.key, required this.text, this.fontSize = 16});
+
+  final String text;
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 0,
+      ),
+    );
+  }
+}
+
+String _formatReleaseTime(DateTime? value) {
+  final date = (value ?? DateTime.now()).toLocal();
+  final period = date.hour < 12 ? '오전' : '오후';
+  final hour = date.hour % 12 == 0 ? 12 : date.hour % 12;
+  final minute = date.minute.toString().padLeft(2, '0');
+  return '${date.year}년 ${date.month}월 ${date.day}일 $period $hour:$minute';
 }
