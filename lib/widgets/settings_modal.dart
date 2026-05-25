@@ -8,6 +8,7 @@ import '../theme.dart';
 
 import '../providers/settings_provider.dart';
 import '../services/update_service.dart';
+import '../system_ui.dart';
 import 'software_update_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -15,16 +16,13 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = context.settingsBg;
     final onSurfaceColor = context.settingsOnSurface;
 
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        systemOverlayStyle: isDark
-            ? SystemUiOverlayStyle.light
-            : SystemUiOverlayStyle.dark,
+        systemOverlayStyle: _settingsSystemOverlay(context, bgColor),
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -162,6 +160,19 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
+SystemUiOverlayStyle _settingsSystemOverlay(
+  BuildContext context,
+  Color navigationBarColor,
+) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  return oneUiSystemOverlayStyle(
+    context: context,
+    navigationBarColor: navigationBarColor,
+    statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+    statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+  );
+}
+
 class _SettingGroup extends StatelessWidget {
   const _SettingGroup({required this.children});
 
@@ -294,9 +305,7 @@ class ThemeSettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        systemOverlayStyle: isDark
-            ? SystemUiOverlayStyle.light
-            : SystemUiOverlayStyle.dark,
+        systemOverlayStyle: _settingsSystemOverlay(context, bgColor),
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -348,16 +357,13 @@ class SoundSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = context.settingsBg;
     final onSurfaceColor = context.settingsOnSurface;
 
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        systemOverlayStyle: isDark
-            ? SystemUiOverlayStyle.light
-            : SystemUiOverlayStyle.dark,
+        systemOverlayStyle: _settingsSystemOverlay(context, bgColor),
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -495,14 +501,13 @@ class ActionBarSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = context.settingsBg;
     final onSurfaceColor = context.settingsOnSurface;
 
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        systemOverlayStyle: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        systemOverlayStyle: _settingsSystemOverlay(context, bgColor),
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -517,10 +522,7 @@ class ActionBarSettingsScreen extends StatelessWidget {
         ),
         title: Text(
           '액션 바 커스텀',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            color: onSurfaceColor,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w700, color: onSurfaceColor),
         ),
       ),
       body: CustomScrollView(
@@ -546,7 +548,10 @@ class ActionBarSettingsScreen extends StatelessWidget {
                   _SettingGroup(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -565,7 +570,9 @@ class ActionBarSettingsScreen extends StatelessWidget {
                                   '${settings.actionBarBlur.round()}',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w700,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -577,7 +584,8 @@ class ActionBarSettingsScreen extends StatelessWidget {
                               min: 0,
                               max: 50,
                               divisions: 50,
-                              onChanged: (value) => settings.setActionBarBlur(value),
+                              onChanged: (value) =>
+                                  settings.setActionBarBlur(value),
                             ),
                           ],
                         ),
@@ -585,7 +593,7 @@ class ActionBarSettingsScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Section 2: Buttons
                   Padding(
                     padding: const EdgeInsets.only(left: 8, bottom: 8),
@@ -622,7 +630,10 @@ class ActionBarSettingsScreen extends StatelessWidget {
                       final isVisible = settings.isButtonVisible(id);
                       return ListTile(
                         key: ValueKey(id),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
                         leading: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -638,15 +649,16 @@ class ActionBarSettingsScreen extends StatelessWidget {
                               width: 32,
                               height: 32,
                               decoration: BoxDecoration(
-                                color: isVisible 
-                                    ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)
+                                color: isVisible
+                                    ? Theme.of(context).colorScheme.primary
+                                          .withValues(alpha: 0.15)
                                     : onSurfaceColor.withValues(alpha: 0.08),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 _getButtonIcon(id),
-                                color: isVisible 
-                                    ? Theme.of(context).colorScheme.primary 
+                                color: isVisible
+                                    ? Theme.of(context).colorScheme.primary
                                     : onSurfaceColor.withValues(alpha: 0.35),
                                 size: 18,
                               ),
@@ -657,14 +669,15 @@ class ActionBarSettingsScreen extends StatelessWidget {
                           _getButtonLabel(id),
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
-                            color: isVisible 
-                                ? onSurfaceColor 
+                            color: isVisible
+                                ? onSurfaceColor
                                 : onSurfaceColor.withValues(alpha: 0.35),
                           ),
                         ),
                         trailing: Switch(
                           value: isVisible,
-                          onChanged: (value) => settings.toggleButtonVisibility(id, value),
+                          onChanged: (value) =>
+                              settings.toggleButtonVisibility(id, value),
                         ),
                       );
                     },
@@ -673,9 +686,7 @@ class ActionBarSettingsScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 40),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
       ),
     );

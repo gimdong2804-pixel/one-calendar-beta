@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../services/update_service.dart';
+import '../system_ui.dart';
 import '../theme.dart';
 
 class RecentUpdateScreen extends StatelessWidget {
@@ -12,7 +13,6 @@ class RecentUpdateScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final info = UpdateService.currentReleaseInfo;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = context.updateDetailBg;
     final textColor = context.settingsOnSurface;
     final bodyTextColor = context.updateBodyText;
@@ -22,14 +22,12 @@ class RecentUpdateScreen extends StatelessWidget {
         .where((line) => line.isNotEmpty)
         .toList();
 
-    final systemOverlay = SystemUiOverlayStyle(
+    final systemOverlay = oneUiSystemOverlayStyle(
+      context: context,
+      navigationBarColor: bgColor,
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
       statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: bgColor,
-      systemNavigationBarIconBrightness: isDark
-          ? Brightness.light
-          : Brightness.dark,
     );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(

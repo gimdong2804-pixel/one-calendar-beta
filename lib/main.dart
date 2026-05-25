@@ -4,12 +4,14 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'providers/planner_provider.dart';
 import 'providers/settings_provider.dart';
 import 'services/background_update_service.dart';
+import 'system_ui.dart';
 import 'theme.dart';
 import 'widgets/planner_screen.dart';
 
@@ -88,12 +90,20 @@ class _OneCalendarAppState extends State<OneCalendarApp> {
       builder: (context, child) {
         final scale = MediaQuery.textScalerOf(context).scale(1);
         final clamped = scale > 1.0 ? 1.0 : scale;
-        return MediaQuery(
-          data: MediaQuery.of(
-            context,
-          ).copyWith(textScaler: TextScaler.linear(clamped)),
-          child: _MobileDisplayScaleGuard(
-            child: child ?? const SizedBox.shrink(),
+        final navigationBarColor = Theme.of(context).scaffoldBackgroundColor;
+
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: oneUiSystemOverlayStyle(
+            context: context,
+            navigationBarColor: navigationBarColor,
+          ),
+          child: MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(clamped)),
+            child: _MobileDisplayScaleGuard(
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         );
       },

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/update_service.dart';
+import '../system_ui.dart';
+import '../theme.dart';
 import 'recent_update_screen.dart';
 import 'software_update_detail_screen.dart';
-import '../theme.dart';
 
 enum UpdateState { idle, checking, upToDate, hasUpdate }
 
@@ -133,6 +134,63 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
         });
   }
 
+  Future<void> _showOverflowMenu() async {
+    final selected = await showGeneralDialog<_UpdateMenuAction>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 180),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return _UpdateOverflowMenu(
+          isDark: isDark,
+          onRecentUpdate: () {
+            Navigator.of(context).pop(_UpdateMenuAction.recentUpdate);
+          },
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        );
+        return FadeTransition(
+          opacity: curved,
+          child: ScaleTransition(
+            alignment: Alignment.topRight,
+            scale: Tween<double>(begin: 0.94, end: 1).animate(curved),
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, -0.025),
+                end: Offset.zero,
+              ).animate(curved),
+              child: child,
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!mounted || selected == null) return;
+
+    switch (selected) {
+      case _UpdateMenuAction.recentUpdate:
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (_, animation, secondaryAnimation) =>
+                const RecentUpdateScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+            transitionDuration: const Duration(milliseconds: 220),
+          ),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -142,12 +200,12 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
 
     final textColor = context.settingsOnSurface;
 
-    final systemOverlay = SystemUiOverlayStyle(
+    final systemOverlay = oneUiSystemOverlayStyle(
+      context: context,
+      navigationBarColor: bgColor,
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: isDark
-          ? Brightness.light
-          : Brightness.dark, // Android
-      statusBarBrightness: isDark ? Brightness.dark : Brightness.light, // iOS
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
     );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -168,49 +226,10 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           actions: [
-            PopupMenuButton<_UpdateMenuAction>(
+            IconButton(
               icon: Icon(Icons.more_vert_rounded, color: textColor),
               tooltip: '더보기',
-              offset: const Offset(0, 12),
-              color: isDark ? const Color(0xFF202124) : Colors.white,
-              elevation: 12,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(26),
-              ),
-              onSelected: (value) {
-                switch (value) {
-                  case _UpdateMenuAction.recentUpdate:
-                    Navigator.of(context).push(
-                      PageRouteBuilder(
-                        pageBuilder: (_, animation, secondaryAnimation) =>
-                            const RecentUpdateScreen(),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                              return FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              );
-                            },
-                        transitionDuration: const Duration(milliseconds: 220),
-                      ),
-                    );
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem<_UpdateMenuAction>(
-                  value: _UpdateMenuAction.recentUpdate,
-                  height: 56,
-                  child: Text(
-                    '최근 업데이트',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                ),
-              ],
+              onPressed: _showOverflowMenu,
             ),
             const SizedBox(width: 8),
           ],
@@ -455,6 +474,78 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _UpdateOverflowMenu extends StatelessWidget {
+  const _UpdateOverflowMenu({
+    required this.isDark,
+    required this.onRecentUpdate,
+  });
+
+  final bool isDark;
+  final VoidCallback onRecentUpdate;
+
+  @override
+  Widget build(BuildContext context) {
+    final textColor = context.settingsOnSurface;
+    final topPadding = MediaQuery.paddingOf(context).top;
+
+    return Material(
+      type: MaterialType.transparency,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => Navigator.of(context).pop(),
+            ),
+          ),
+          Positioned(
+            top: topPadding + 52,
+            right: 18,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF202124) : Colors.white,
+                borderRadius: BorderRadius.circular(26),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.32 : 0.14),
+                    blurRadius: 22,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(26),
+                child: InkWell(
+                  onTap: onRecentUpdate,
+                  child: SizedBox(
+                    width: 206,
+                    height: 58,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
+                        child: Text(
+                          '최근 업데이트',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

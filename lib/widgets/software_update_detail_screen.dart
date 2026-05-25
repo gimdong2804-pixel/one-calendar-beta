@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
 import '../services/update_service.dart';
+import '../system_ui.dart';
 import '../theme.dart';
 
 enum DownloadState { idle, downloading, completed, error }
@@ -131,14 +132,12 @@ class _SoftwareUpdateDetailScreenState
     final dragHandleColor = context.updateDragHandle;
     final topPadding = MediaQuery.of(context).padding.top;
 
-    final systemOverlay = SystemUiOverlayStyle(
+    final systemOverlay = oneUiSystemOverlayStyle(
+      context: context,
+      navigationBarColor: bgColor,
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
-      systemNavigationBarColor: bgColor,
-      systemNavigationBarIconBrightness: isDark
-          ? Brightness.light
-          : Brightness.dark,
     );
 
     final screenHeight = MediaQuery.of(context).size.height;
