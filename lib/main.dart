@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -31,8 +30,6 @@ Future<void> main() async {
     });
   }
 
-  Intl.defaultLocale = 'ko_KR';
-
   runApp(
     MultiProvider(
       providers: [
@@ -58,7 +55,7 @@ class _OneCalendarAppState extends State<OneCalendarApp> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
         unawaited(
-          Future<void>.delayed(const Duration(seconds: 2), () async {
+          Future<void>.delayed(const Duration(seconds: 6), () async {
             await BackgroundUpdateService.initialize();
           }).catchError((e) {
             debugPrint('백그라운드 업데이트 서비스 초기화 실패: $e');

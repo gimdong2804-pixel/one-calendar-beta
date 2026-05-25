@@ -18,7 +18,7 @@ class PlannerProvider with ChangeNotifier {
   PlannerPanel _activePanel = PlannerPanel.priorities;
   SharedPreferences? _prefs;
   Timer? _saveDebounce;
-  bool _isLoading = true;
+  final bool _isLoading = false;
   bool _isSaving = false;
 
   DateTime get currentDate => _currentDate;
@@ -246,8 +246,6 @@ class PlannerProvider with ChangeNotifier {
   }
 
   Future<void> _loadForDate(DateTime date) async {
-    _isLoading = true;
-    notifyListeners();
     final prefs = await _preferences;
     final key = 'planData_${plannerDateKey(date)}_flutter';
     final raw = prefs.getString(key);
@@ -263,7 +261,6 @@ class PlannerProvider with ChangeNotifier {
         _data = PlannerData.defaults();
       }
     }
-    _isLoading = false;
     notifyListeners();
   }
 

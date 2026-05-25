@@ -8,8 +8,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const int fallbackCurrentBuildNumber = 46;
-const String currentVersionName = 'One UI 1.0 (Beta 46)';
+const int fallbackCurrentBuildNumber = 47;
+const String currentVersionName = 'One UI 1.0 (Beta 47)';
+const String currentReleaseDateIso = '2026-05-25T13:41:58+09:00';
+const String currentReleaseChangelog = '앱이 바로 켜지도록 수정\n최근 업데이트 보는 기능 추가';
 
 const String _updateInfoUrl =
     'https://raw.githubusercontent.com/gimdong2804-pixel/one-calendar-beta/main/update_info.json';
@@ -55,6 +57,16 @@ class UpdateInfo {
 }
 
 class UpdateService {
+  static UpdateInfo get currentReleaseInfo {
+    return UpdateInfo(
+      latestBuildNumber: fallbackCurrentBuildNumber,
+      versionName: currentVersionName,
+      downloadUrl: '',
+      changelog: currentReleaseChangelog,
+      releasedAt: DateTime.tryParse(currentReleaseDateIso),
+    );
+  }
+
   static Future<CurrentAppVersion> getCurrentAppVersion() async {
     try {
       final packageInfo = await PackageInfo.fromPlatform();

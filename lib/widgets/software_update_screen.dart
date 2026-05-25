@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/update_service.dart';
+import 'recent_update_screen.dart';
 import 'software_update_detail_screen.dart';
 import '../theme.dart';
 
 enum UpdateState { idle, checking, upToDate, hasUpdate }
+
+enum _UpdateMenuAction { recentUpdate }
 
 class SoftwareUpdateScreen extends StatefulWidget {
   const SoftwareUpdateScreen({super.key});
@@ -165,19 +168,49 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           actions: [
-            // Reserved for future features - currently shows a clean placeholder
-            IconButton(
+            PopupMenuButton<_UpdateMenuAction>(
               icon: Icon(Icons.more_vert_rounded, color: textColor),
-              onPressed: () {
-                ScaffoldMessenger.of(context)
-                  ..clearSnackBars()
-                  ..showSnackBar(
-                    const SnackBar(
-                      content: Text('추후 기능이 제공될 예정입니다.'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
+              tooltip: '더보기',
+              offset: const Offset(0, 12),
+              color: isDark ? const Color(0xFF202124) : Colors.white,
+              elevation: 12,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(26),
+              ),
+              onSelected: (value) {
+                switch (value) {
+                  case _UpdateMenuAction.recentUpdate:
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                        pageBuilder: (_, animation, secondaryAnimation) =>
+                            const RecentUpdateScreen(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                        transitionDuration: const Duration(milliseconds: 220),
+                      ),
+                    );
+                }
               },
+              itemBuilder: (context) => [
+                PopupMenuItem<_UpdateMenuAction>(
+                  value: _UpdateMenuAction.recentUpdate,
+                  height: 56,
+                  child: Text(
+                    '최근 업데이트',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(width: 8),
           ],
