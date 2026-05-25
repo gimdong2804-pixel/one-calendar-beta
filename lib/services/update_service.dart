@@ -8,8 +8,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const int fallbackCurrentBuildNumber = 45;
-const String currentVersionName = 'One UI 1.0 (Beta 45)';
+const int fallbackCurrentBuildNumber = 46;
+const String currentVersionName = 'One UI 1.0 (Beta 46)';
 
 const String _updateInfoUrl =
     'https://raw.githubusercontent.com/gimdong2804-pixel/one-calendar-beta/main/update_info.json';

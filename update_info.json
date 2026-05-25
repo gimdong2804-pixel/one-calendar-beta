@@ -1,7 +1,7 @@
 {
-  "latestBuildNumber": 45,
-  "versionName": "One UI 1.0 (Beta 45)",
-  "releasedAt": "2026-05-24T21:22:00+09:00",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2045).apk",
-  "changelog": "모바일 UI 크기 안정성을 개선했습니다.\n시스템 표시 크기가 큰 환경에서 화면 요소가 과도하게 커지는 문제를 수정했습니다."
+  "latestBuildNumber": 46,
+  "versionName": "One UI 1.0 (Beta 46)",
+  "releasedAt": "2026-05-25T13:05:35+09:00",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2046).apk",
+  "changelog": "앱 실행 속도를 높였습니다.\n앱 아이콘을 교체했습니다."
 }

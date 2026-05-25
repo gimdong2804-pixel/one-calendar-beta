@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/planner_data.dart';
@@ -12,6 +11,11 @@ import '../providers/settings_provider.dart';
 import '../theme.dart';
 import 'animated_fab_icons.dart';
 import 'settings_modal.dart';
+
+String koreanWeekday(DateTime date) {
+  const weekdays = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+  return weekdays[date.weekday - 1];
+}
 
 class PlannerScreen extends StatelessWidget {
   const PlannerScreen({super.key});
@@ -158,7 +162,7 @@ class _DesktopDateHeader extends StatelessWidget {
     final planner = context.watch<PlannerProvider>();
     final date = planner.currentDate;
     final dateText = plannerDateKey(date);
-    final weekday = DateFormat('EEEE', 'ko_KR').format(date);
+    final weekday = koreanWeekday(date);
 
     return Column(
       children: [
@@ -215,7 +219,7 @@ class _MobileDateDock extends StatelessWidget {
   Widget build(BuildContext context) {
     final planner = context.watch<PlannerProvider>();
     final date = planner.currentDate;
-    final weekday = DateFormat('EEEE', 'ko_KR').format(date);
+    final weekday = koreanWeekday(date);
     final displayDate =
         '${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
 
@@ -1410,84 +1414,85 @@ class _ActionBar extends StatelessWidget {
     final settings = context.watch<SettingsProvider>();
     final planner = context.watch<PlannerProvider>();
 
-    final buttons = settings.actionBarOrder.where((id) => settings.isButtonVisible(id)).map((id) {
-      switch (id) {
-        case 'btnAIChat':
-          return _ActionButton(
-            key: const ValueKey('btnAIChat'),
-            icon: Icons.smart_toy_rounded,
-            label: 'AI 어시스턴트',
-            color: Theme.of(context).colorScheme.primary,
-            onPressed: () => _showSnack(
-              context,
-              'AI 어시스턴트 화면은 Flutter UI 이식 다음 단계에서 연결됩니다.',
-            ),
-          );
-        case 'btnToggleAI':
-          return _ActionButton(
-            key: const ValueKey('btnToggleAI'),
-            icon: Icons.auto_awesome_rounded,
-            label: 'AI가 짠 예시 보기',
-            color: Theme.of(context).colorScheme.tertiary,
-            onPressed: () {
-              context.read<PlannerProvider>().applyAiExample();
-              _showSnack(context, '예시 계획을 적용했습니다.');
-            },
-          );
-        case 'btnReset':
-          return _ActionButton(
-            key: const ValueKey('btnReset'),
-            icon: Icons.refresh_rounded,
-            label: '전체 초기화',
-            muted: true,
-            onPressed: () => _confirmClear(context),
-          );
-        case 'btnSave':
-          return _ActionButton(
-            key: const ValueKey('btnSave'),
-            icon: Icons.save_rounded,
-            label: planner.isSaving ? '자동 저장 중...' : '자동 저장 완료',
-            color: Theme.of(context).colorScheme.primary,
-            onPressed: () async {
-              await context.read<PlannerProvider>().saveNow();
-              if (context.mounted) _showSnack(context, '저장했습니다.');
-            },
-          );
-        case 'btnCloudSync':
-          return _ActionButton(
-            key: const ValueKey('btnCloudSync'),
-            icon: Icons.cloud_rounded,
-            label: '클라우드',
-            color: const Color(0xFF2563EB),
-            onPressed: () => _showSnack(
-              context,
-              '클라우드 동기화는 기존 HTML 로직 분석 후 안전하게 옮길 예정입니다.',
-            ),
-          );
-        case 'btnLoginLogout':
-          return _ActionButton(
-            key: const ValueKey('btnLoginLogout'),
-            icon: Icons.key_rounded,
-            label: '로그인 / 가입',
-            muted: true,
-            onPressed: () =>
-                _showSnack(context, '계정 연동 UI는 클라우드 단계에서 함께 연결됩니다.'),
-          );
-        case 'btnPrint':
-          return _ActionButton(
-            key: const ValueKey('btnPrint'),
-            icon: Icons.print_rounded,
-            label: 'PDF 인쇄',
-            muted: true,
-            onPressed: () => _showSnack(
-              context,
-              '인쇄 기능은 플랫폼별 출력 방식에 맞춰 다음 단계에서 연결됩니다.',
-            ),
-          );
-        default:
-          return const SizedBox.shrink();
-      }
-    }).toList();
+    final buttons = settings.actionBarOrder
+        .where((id) => settings.isButtonVisible(id))
+        .map((id) {
+          switch (id) {
+            case 'btnAIChat':
+              return _ActionButton(
+                key: const ValueKey('btnAIChat'),
+                icon: Icons.smart_toy_rounded,
+                label: 'AI 어시스턴트',
+                color: Theme.of(context).colorScheme.primary,
+                onPressed: () => _showSnack(
+                  context,
+                  'AI 어시스턴트 화면은 Flutter UI 이식 다음 단계에서 연결됩니다.',
+                ),
+              );
+            case 'btnToggleAI':
+              return _ActionButton(
+                key: const ValueKey('btnToggleAI'),
+                icon: Icons.auto_awesome_rounded,
+                label: 'AI가 짠 예시 보기',
+                color: Theme.of(context).colorScheme.tertiary,
+                onPressed: () {
+                  context.read<PlannerProvider>().applyAiExample();
+                  _showSnack(context, '예시 계획을 적용했습니다.');
+                },
+              );
+            case 'btnReset':
+              return _ActionButton(
+                key: const ValueKey('btnReset'),
+                icon: Icons.refresh_rounded,
+                label: '전체 초기화',
+                muted: true,
+                onPressed: () => _confirmClear(context),
+              );
+            case 'btnSave':
+              return _ActionButton(
+                key: const ValueKey('btnSave'),
+                icon: Icons.save_rounded,
+                label: planner.isSaving ? '자동 저장 중...' : '자동 저장 완료',
+                color: Theme.of(context).colorScheme.primary,
+                onPressed: () async {
+                  await context.read<PlannerProvider>().saveNow();
+                  if (context.mounted) _showSnack(context, '저장했습니다.');
+                },
+              );
+            case 'btnCloudSync':
+              return _ActionButton(
+                key: const ValueKey('btnCloudSync'),
+                icon: Icons.cloud_rounded,
+                label: '클라우드',
+                color: const Color(0xFF2563EB),
+                onPressed: () => _showSnack(
+                  context,
+                  '클라우드 동기화는 기존 HTML 로직 분석 후 안전하게 옮길 예정입니다.',
+                ),
+              );
+            case 'btnLoginLogout':
+              return _ActionButton(
+                key: const ValueKey('btnLoginLogout'),
+                icon: Icons.key_rounded,
+                label: '로그인 / 가입',
+                muted: true,
+                onPressed: () =>
+                    _showSnack(context, '계정 연동 UI는 클라우드 단계에서 함께 연결됩니다.'),
+              );
+            case 'btnPrint':
+              return _ActionButton(
+                key: const ValueKey('btnPrint'),
+                icon: Icons.print_rounded,
+                label: 'PDF 인쇄',
+                muted: true,
+                onPressed: () =>
+                    _showSnack(context, '인쇄 기능은 플랫폼별 출력 방식에 맞춰 다음 단계에서 연결됩니다.'),
+              );
+            default:
+              return const SizedBox.shrink();
+          }
+        })
+        .toList();
 
     return SafeArea(
       top: false,
@@ -1522,9 +1527,7 @@ class _ActionBar extends StatelessWidget {
                     horizontal: 24,
                     vertical: 14,
                   ),
-                  child: Row(
-                    children: buttons,
-                  ),
+                  child: Row(children: buttons),
                 ),
               ),
             ),
