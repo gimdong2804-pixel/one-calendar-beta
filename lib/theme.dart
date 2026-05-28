@@ -159,16 +159,91 @@ class AppTheme {
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: ZoomPageTransitionsBuilder(),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
-          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
+          TargetPlatform.android: OneUIPageTransitionsBuilder(),
+          TargetPlatform.iOS: OneUIPageTransitionsBuilder(),
+          TargetPlatform.windows: OneUIPageTransitionsBuilder(),
+          TargetPlatform.macOS: OneUIPageTransitionsBuilder(),
+          TargetPlatform.linux: OneUIPageTransitionsBuilder(),
         },
       ),
     );
   }
 }
+
+class OneUIPageTransitionsBuilder extends PageTransitionsBuilder {
+  const OneUIPageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    // One UI 8/9 감속 곡선 스타일
+    final curve = CurvedAnimation(
+      parent: animation,
+      curve: const Cubic(0.19, 1.0, 0.22, 1.0),
+      reverseCurve: const Cubic(0.19, 1.0, 0.22, 1.0),
+    );
+
+    // 슬라이드 효과 (오른쪽에서 왼쪽으로)
+    final slideIn = Tween<Offset>(
+      begin: const Offset(1.0, 0.0),
+      end: Offset.zero,
+    ).animate(curve);
+
+    // 페이드 효과 (부드러운 페이드)
+    final fadeIn = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(curve);
+
+    // 뒤에 깔리는 페이지의 연출
+    final secondaryCurve = CurvedAnimation(
+      parent: secondaryAnimation,
+      curve: const Cubic(0.19, 1.0, 0.22, 1.0),
+      reverseCurve: const Cubic(0.19, 1.0, 0.22, 1.0),
+    );
+
+    // 뒤에 깔리는 페이지는 왼쪽으로 부드럽게 약간 밀림
+    final slideOut = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(-0.15, 0.0),
+    ).animate(secondaryCurve);
+
+    // 뒤에 깔리는 페이지는 미세하게 작아짐
+    final scaleOut = Tween<double>(
+      begin: 1.0,
+      end: 0.96,
+    ).animate(secondaryCurve);
+
+    // 뒤에 깔리는 페이지의 페이드 아웃
+    final fadeOut = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(secondaryCurve);
+
+    return SlideTransition(
+      position: slideOut,
+      child: ScaleTransition(
+        scale: scaleOut,
+        child: FadeTransition(
+          opacity: fadeOut,
+          child: SlideTransition(
+            position: slideIn,
+            child: FadeTransition(
+              opacity: fadeIn,
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 class AppThemeColors extends ThemeExtension<AppThemeColors> {
   final Color mutedText;
