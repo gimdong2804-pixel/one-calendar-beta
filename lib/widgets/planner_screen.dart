@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../models/planner_data.dart';
@@ -1888,6 +1889,10 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
 
   void _handleTap() {
     _bounceController.forward(from: 0);
+    final settings = Provider.of<SettingsProvider>(context, listen: false);
+    if (settings.isSoundEnabled) {
+      unawaited(SystemSound.play(SystemSoundType.click));
+    }
     widget.onPressed();
   }
 

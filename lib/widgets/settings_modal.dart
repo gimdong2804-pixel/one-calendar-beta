@@ -262,24 +262,8 @@ class _Divider extends StatelessWidget {
 void showSettingsModal(BuildContext context) {
   FocusManager.instance.primaryFocus?.unfocus();
   Navigator.of(context).push(
-    PageRouteBuilder<void>(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          const SettingsScreen(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.easeOutCubic;
-
-        var tween = Tween(
-          begin: begin,
-          end: end,
-        ).chain(CurveTween(curve: curve));
-        var offsetAnimation = animation.drive(tween);
-
-        return SlideTransition(position: offsetAnimation, child: child);
-      },
-      transitionDuration: const Duration(milliseconds: 300),
-      reverseTransitionDuration: const Duration(milliseconds: 300),
+    MaterialPageRoute<void>(
+      builder: (context) => const SettingsScreen(),
     ),
   );
 }
@@ -335,6 +319,9 @@ class ThemeSettingsScreen extends StatelessWidget {
                 trailing: Switch(
                   value: isDark,
                   onChanged: (value) {
+                    if (settings.isSoundEnabled) {
+                      unawaited(SystemSound.play(SystemSoundType.click));
+                    }
                     unawaited(
                       settings.setThemeMode(
                         value ? ThemeMode.dark : ThemeMode.light,
@@ -392,8 +379,12 @@ class SoundSettingsScreen extends StatelessWidget {
                 title: '터치음',
                 trailing: Switch(
                   value: settings.isSoundEnabled,
-                  onChanged: (value) =>
-                      unawaited(settings.setSoundEnabled(value)),
+                  onChanged: (value) {
+                    if (value || settings.isSoundEnabled) {
+                      unawaited(SystemSound.play(SystemSoundType.click));
+                    }
+                    unawaited(settings.setSoundEnabled(value));
+                  },
                 ),
               ),
               AnimatedSize(

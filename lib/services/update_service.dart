@@ -8,10 +8,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const int fallbackCurrentBuildNumber = 52;
-const String currentVersionName = 'One UI 1.0 (Beta 52)';
-const String currentReleaseDateIso = '2026-05-28T21:43:00+09:00';
-const String currentReleaseChangelog = '- 화면 전환 애니메이션을 부드러운 좌우 슬라이딩 방식으로 변경';
+const int fallbackCurrentBuildNumber = 53;
+const String currentVersionName = 'One UI 1.0 (Beta 53)';
+const String currentReleaseDateIso = '2026-05-28T21:51:00+09:00';
+const String currentReleaseChangelog = '- 화면 전환 속도 및 부드러움 개선\n- 최근 업데이트 화면에 화면 전환 효과가 적용되지 않던 문제 해결\n- 설정 화면의 소리 및 테마 스위치 조작 시 터치음이 들리지 않던 문제 해결';
 
 const String _updateInfoUrl =
     'https://raw.githubusercontent.com/gimdong2804-pixel/one-calendar-beta/main/update_info.json';

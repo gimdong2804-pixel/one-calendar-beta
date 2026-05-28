@@ -104,24 +104,8 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
   void _navigateToDetail(UpdateInfo info) {
     Navigator.of(context)
         .push(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                SoftwareUpdateDetailScreen(updateInfo: info),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(1.0, 0.0);
-                  const end = Offset.zero;
-                  const curve = Curves.easeInOutCubic;
-                  var tween = Tween(
-                    begin: begin,
-                    end: end,
-                  ).chain(CurveTween(curve: curve));
-                  return SlideTransition(
-                    position: animation.drive(tween),
-                    child: child,
-                  );
-                },
-            transitionDuration: const Duration(milliseconds: 400),
+          MaterialPageRoute(
+            builder: (_) => SoftwareUpdateDetailScreen(updateInfo: info),
           ),
         )
         .then((_) {
@@ -178,14 +162,8 @@ class _SoftwareUpdateScreenState extends State<SoftwareUpdateScreen> {
     switch (selected) {
       case _UpdateMenuAction.recentUpdate:
         Navigator.of(context).push(
-          PageRouteBuilder(
-            pageBuilder: (_, animation, secondaryAnimation) =>
-                const RecentUpdateScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-            transitionDuration: const Duration(milliseconds: 220),
+          MaterialPageRoute(
+            builder: (_) => const RecentUpdateScreen(),
           ),
         );
     }

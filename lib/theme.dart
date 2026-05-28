@@ -181,11 +181,11 @@ class OneUIPageTransitionsBuilder extends PageTransitionsBuilder {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    // One UI 8/9 감속 곡선 스타일
+    // One UI 감속 곡선 스타일
     final curve = CurvedAnimation(
       parent: animation,
-      curve: const Cubic(0.19, 1.0, 0.22, 1.0),
-      reverseCurve: const Cubic(0.19, 1.0, 0.22, 1.0),
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeOutCubic,
     );
 
     // 슬라이드 효과 (오른쪽에서 왼쪽으로)
@@ -203,8 +203,8 @@ class OneUIPageTransitionsBuilder extends PageTransitionsBuilder {
     // 뒤에 깔리는 페이지의 연출
     final secondaryCurve = CurvedAnimation(
       parent: secondaryAnimation,
-      curve: const Cubic(0.19, 1.0, 0.22, 1.0),
-      reverseCurve: const Cubic(0.19, 1.0, 0.22, 1.0),
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeOutCubic,
     );
 
     // 뒤에 깔리는 페이지는 왼쪽으로 부드럽게 약간 밀림
