@@ -225,17 +225,19 @@ class OneUIPageTransitionsBuilder extends PageTransitionsBuilder {
       end: 0.0,
     ).animate(secondaryCurve);
 
-    return SlideTransition(
-      position: slideOut,
-      child: ScaleTransition(
-        scale: scaleOut,
-        child: FadeTransition(
-          opacity: fadeOut,
-          child: SlideTransition(
-            position: slideIn,
-            child: FadeTransition(
-              opacity: fadeIn,
-              child: child,
+    return RepaintBoundary(
+      child: SlideTransition(
+        position: slideOut,
+        child: ScaleTransition(
+          scale: scaleOut,
+          child: FadeTransition(
+            opacity: fadeOut,
+            child: SlideTransition(
+              position: slideIn,
+              child: FadeTransition(
+                opacity: fadeIn,
+                child: RepaintBoundary(child: child),
+              ),
             ),
           ),
         ),

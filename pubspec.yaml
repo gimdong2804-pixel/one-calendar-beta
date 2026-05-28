@@ -2,7 +2,7 @@ name: one_calendar
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.0-beta.53+53
+version: 1.0.0-beta.54+54
 
 environment:
   sdk: ^3.11.5
