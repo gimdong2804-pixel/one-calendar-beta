@@ -123,175 +123,143 @@ class _SoftwareUpdateDetailScreenState
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     final bgColor = context.updateDetailBg;
     final textColor = context.settingsOnSurface;
     final subTextColor = context.updateSubText;
     final bodyTextColor = context.updateBodyText;
-    final dragHandleColor = context.updateDragHandle;
-    final topPadding = MediaQuery.of(context).padding.top;
 
     final systemOverlay = oneUiSystemOverlayStyle(
       context: context,
       navigationBarColor: bgColor,
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-      statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
     );
 
-    final screenHeight = MediaQuery.of(context).size.height;
     final changes = _changelogItems();
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: systemOverlay,
       child: Scaffold(
-        backgroundColor: isDark ? Colors.black : const Color(0xFFF7F7FA),
+        backgroundColor: bgColor,
         body: Stack(
           children: [
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: screenHeight * 0.45,
-              child: Image.asset(
-                'assets/images/one_ui_8_5_wallpaper.png',
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFFFF8C00),
-                          Color(0xFF8A2387),
-                          Color(0xFF00F2FE),
-                        ],
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'One UI 1.0',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
             Positioned.fill(
-              child: DraggableScrollableSheet(
-                initialChildSize: 0.60,
-                minChildSize: 0.60,
-                maxChildSize: 1.0,
-                snap: true,
-                snapSizes: const [0.60, 1.0],
-                builder: (context, scrollController) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: bgColor,
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(32),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: context.updateCardShadow,
-                          blurRadius: 15,
-                          offset: const Offset(0, -5),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        SizedBox(height: topPadding + 12),
-                        Container(
-                          width: 44,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: dragHandleColor,
-                            borderRadius: BorderRadius.circular(2),
+              child: Column(
+                children: [
+                  Expanded(
+                    flex: 9,
+                    child: Image.asset(
+                      'assets/images/one_ui_8_5_wallpaper.png',
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFFFF8C00),
+                                Color(0xFF8A2387),
+                                Color(0xFF00F2FE),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        Expanded(
-                          child: ListView(
-                            controller: scrollController,
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            physics: const ClampingScrollPhysics(),
-                            children: [
-                              Text(
-                                '업데이트 있음',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                _formatReleaseTime(
-                                  widget.updateInfo.releasedAt,
-                                ),
-                                style: TextStyle(
-                                  color: subTextColor,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: 0,
-                                ),
-                              ),
-                              const SizedBox(height: 28),
-                              Text(
-                                widget.updateInfo.versionName,
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                  height: 1.35,
-                                  letterSpacing: 0,
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-                              for (final item in changes)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 10),
-                                  child: _ChangeLine(
-                                    text: item,
-                                    color: bodyTextColor,
-                                  ),
-                                ),
-                              const SizedBox(height: 40),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(
-                            left: 24,
-                            right: 24,
-                            bottom: MediaQuery.of(context).padding.bottom + 16,
-                            top: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: bgColor,
-                            border: Border(
-                              top: BorderSide(
-                                color: context.updateLogBg,
-                                width: 1,
+                          child: const Center(
+                            child: Text(
+                              'One UI 1.0',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                          child: _buildProgressButton(),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
+                  ),
+                  Expanded(
+                    flex: 10,
+                    child: Container(
+                      width: double.infinity,
+                      color: bgColor,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: ListView(
+                              padding: const EdgeInsets.fromLTRB(24, 30, 24, 40),
+                              physics: const ClampingScrollPhysics(),
+                              children: [
+                                Text(
+                                  '업데이트 있음',
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0,
+                                    height: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  _formatReleaseTime(
+                                    widget.updateInfo.releasedAt,
+                                  ),
+                                  style: TextStyle(
+                                    color: subTextColor,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0,
+                                  ),
+                                ),
+                                const SizedBox(height: 26),
+                                Text(
+                                  widget.updateInfo.versionName,
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                    height: 1.35,
+                                    letterSpacing: 0,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                for (final item in changes)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: _ChangeLine(
+                                      text: item,
+                                      color: bodyTextColor,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: 24,
+                              right: 24,
+                              bottom: MediaQuery.of(context).padding.bottom + 16,
+                              top: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: bgColor,
+                              border: Border(
+                                top: BorderSide(
+                                  color: context.updateLogBg,
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: _buildProgressButton(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Positioned(
@@ -303,12 +271,12 @@ class _SoftwareUpdateDetailScreenState
                   child: Container(
                     width: 44,
                     height: 44,
-                    color: context.updateLogBg,
+                    color: Colors.black.withValues(alpha: 0.28),
                     child: Center(
                       child: IconButton(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: context.settingsOnSurface,
+                          color: Colors.white,
                           size: 18,
                         ),
                         onPressed: () => Navigator.of(context).pop(),
