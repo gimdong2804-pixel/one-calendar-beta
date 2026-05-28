@@ -8,10 +8,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const int fallbackCurrentBuildNumber = 48;
-const String currentVersionName = 'One UI 1.0 (Beta 48)';
-const String currentReleaseDateIso = '2026-05-25T14:08:53+09:00';
-const String currentReleaseChangelog = '애니메이션이 부자연스러운 문제 수정\n그 외 버그 수정';
+const int fallbackCurrentBuildNumber = 49;
+const String currentVersionName = 'One UI 1.0 (Beta 49)';
+const String currentReleaseDateIso = '2026-05-28T20:52:00+09:00';
+const String currentReleaseChangelog = '- 다크 모드 전환 시 화면 상단 색상이 바뀌지 않는 문제 수정';
 
 const String _updateInfoUrl =
     'https://raw.githubusercontent.com/gimdong2804-pixel/one-calendar-beta/main/update_info.json';

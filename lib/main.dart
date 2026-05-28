@@ -90,19 +90,29 @@ class _OneCalendarAppState extends State<OneCalendarApp> {
       builder: (context, child) {
         final scale = MediaQuery.textScalerOf(context).scale(1);
         final clamped = scale > 1.0 ? 1.0 : scale;
-        final navigationBarColor = Theme.of(context).scaffoldBackgroundColor;
 
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: oneUiSystemOverlayStyle(
-            context: context,
-            navigationBarColor: navigationBarColor,
-          ),
-          child: MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(textScaler: TextScaler.linear(clamped)),
-            child: _MobileDisplayScaleGuard(
-              child: child ?? const SizedBox.shrink(),
+        return MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(clamped)),
+          child: _MobileDisplayScaleGuard(
+            child: Builder(
+              builder: (context) {
+                final theme = Theme.of(context);
+                final isDark = theme.brightness == Brightness.dark;
+                final navigationBarColor = theme.scaffoldBackgroundColor;
+
+                return AnnotatedRegion<SystemUiOverlayStyle>(
+                  value: oneUiSystemOverlayStyle(
+                    context: context,
+                    navigationBarColor: navigationBarColor,
+                    statusBarColor: Colors.transparent,
+                    statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+                    statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+                  ),
+                  child: child ?? const SizedBox.shrink(),
+                );
+              },
             ),
           ),
         );

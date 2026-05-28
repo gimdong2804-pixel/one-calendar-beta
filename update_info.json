@@ -1,7 +1,7 @@
 {
-  "latestBuildNumber": 48,
-  "versionName": "One UI 1.0 (Beta 48)",
-  "releasedAt": "2026-05-25T14:08:53+09:00",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2048).apk",
-  "changelog": "애니메이션이 부자연스러운 문제 수정\n그 외 버그 수정"
+  "latestBuildNumber": 49,
+  "versionName": "One UI 1.0 (Beta 49)",
+  "releasedAt": "2026-05-28T20:52:00+09:00",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2049).apk",
+  "changelog": "- 다크 모드 전환 시 화면 상단 색상이 바뀌지 않는 문제 수정"
 }
