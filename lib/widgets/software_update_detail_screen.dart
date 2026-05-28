@@ -402,6 +402,7 @@ class _SoftwareUpdateDetailScreenState
     final items = widget.updateInfo.changelog
         .split(RegExp(r'\r?\n'))
         .map((line) => line.trim())
+        .map((line) => line.startsWith('-') ? line.substring(1).trim() : line)
         .where((line) => line.isNotEmpty)
         .toList();
 

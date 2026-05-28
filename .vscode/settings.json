@@ -1,0 +1,26 @@
+{
+  "editor.inlineSuggest.enabled": false,
+  "editor.quickSuggestions": {
+    "other": "off",
+    "comments": "off",
+    "strings": "off"
+  },
+  "editor.suggestOnTriggerCharacters": false,
+  "editor.parameterHints.enabled": false,
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": false
+  },
+  "editor.unicodeHighlight.nonBasicASCII": false,
+  "editor.unicodeHighlight.invisibleCharacters": false,
+  "editor.unicodeHighlight.ambiguousCharacters": false,
+  "editor.bracketPairColorization.enabled": false,
+  "markdown.validate.enabled": false,
+  "workbench.colorCustomizations": {
+    "editorUnicodeHighlight.background": "#00000000",
+    "editorUnicodeHighlight.border": "#00000000",
+    "editorError.foreground": "#00000000",
+    "editorWarning.foreground": "#00000000"
+  }
+}

@@ -19,6 +19,7 @@ class RecentUpdateScreen extends StatelessWidget {
     final changes = info.changelog
         .split(RegExp(r'\r?\n'))
         .map((line) => line.trim())
+        .map((line) => line.startsWith('-') ? line.substring(1).trim() : line)
         .where((line) => line.isNotEmpty)
         .toList();
 

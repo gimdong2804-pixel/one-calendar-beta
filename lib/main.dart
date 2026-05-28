@@ -88,33 +88,32 @@ class _OneCalendarAppState extends State<OneCalendarApp> {
         GlobalWidgetsLocalizations.delegate,
       ],
       builder: (context, child) {
-        final scale = MediaQuery.textScalerOf(context).scale(1);
-        final clamped = scale > 1.0 ? 1.0 : scale;
+        return Builder(
+          builder: (context) {
+            final theme = Theme.of(context);
+            final isDark = theme.brightness == Brightness.dark;
+            final navigationBarColor = theme.scaffoldBackgroundColor;
+            final scale = MediaQuery.textScalerOf(context).scale(1);
+            final clamped = scale > 1.0 ? 1.0 : scale;
 
-        return MediaQuery(
-          data: MediaQuery.of(
-            context,
-          ).copyWith(textScaler: TextScaler.linear(clamped)),
-          child: _MobileDisplayScaleGuard(
-            child: Builder(
-              builder: (context) {
-                final theme = Theme.of(context);
-                final isDark = theme.brightness == Brightness.dark;
-                final navigationBarColor = theme.scaffoldBackgroundColor;
-
-                return AnnotatedRegion<SystemUiOverlayStyle>(
-                  value: oneUiSystemOverlayStyle(
-                    context: context,
-                    navigationBarColor: navigationBarColor,
-                    statusBarColor: Colors.transparent,
-                    statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-                    statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
-                  ),
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: oneUiSystemOverlayStyle(
+                context: context,
+                navigationBarColor: navigationBarColor,
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+                statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+              ),
+              child: MediaQuery(
+                data: MediaQuery.of(
+                  context,
+                ).copyWith(textScaler: TextScaler.linear(clamped)),
+                child: _MobileDisplayScaleGuard(
                   child: child ?? const SizedBox.shrink(),
-                );
-              },
-            ),
-          ),
+                ),
+              ),
+            );
+          },
         );
       },
       home: const PlannerScreen(),
