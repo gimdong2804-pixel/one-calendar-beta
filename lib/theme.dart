@@ -209,29 +209,21 @@ class OneUIPageTransitionsBuilder extends PageTransitionsBuilder {
 
     return SlideTransition(
       position: slideOut,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // 뒤에 깔리는 페이지
-          child,
-          // 새로 들어오는 페이지와 그림자
-          SlideTransition(
-            position: slideIn,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 25,
-                    spreadRadius: 1,
-                    offset: const Offset(-8, 0),
-                  ),
-                ],
+      child: SlideTransition(
+        position: slideIn,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 25,
+                spreadRadius: 1,
+                offset: const Offset(-8, 0),
               ),
-              child: child,
-            ),
+            ],
           ),
-        ],
+          child: RepaintBoundary(child: child),
+        ),
       ),
     );
   }

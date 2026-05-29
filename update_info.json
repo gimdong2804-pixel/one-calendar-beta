@@ -1,7 +1,7 @@
 {
-  "latestBuildNumber": 59,
-  "versionName": "One UI 1.0 (Beta 59)",
-  "releasedAt": "2026-05-29T21:00:00+09:00",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2059)/app-release.apk",
-  "changelog": "- 화면 전환 애니메이션의 시각적 오류 수정\n- 뒤로가기 시 화면이 깨지던 문제 수정"
+  "latestBuildNumber": 60,
+  "versionName": "One UI 1.0 (Beta 60)",
+  "releasedAt": "2026-05-29T21:09:00+09:00",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2060)/app-release.apk",
+  "changelog": "- 설정 화면과 메인 화면을 오갈 때 버벅이던 문제 수정"
 }
