@@ -211,23 +211,32 @@ class OneUIPageTransitionsBuilder extends PageTransitionsBuilder {
       child: SlideTransition(
         position: slideOut,
         child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            // 페이지 사이의 그림자 (입체감 부여)
-            SlideTransition(
-              position: slideIn,
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 20,
-                      spreadRadius: 2,
-                      offset: const Offset(-10, 0),
+            // 페이지 사이의 그림자 (움직일 때만 입체감 부여)
+            AnimatedBuilder(
+              animation: animation,
+              builder: (context, child) {
+                // 페이지가 완전히 멈추면(1.0) 그림자 렌더링을 생략하여 성능 확보
+                if (animation.isCompleted) return child!;
+                return SlideTransition(
+                  position: slideIn,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.12),
+                          blurRadius: 25,
+                          spreadRadius: 1,
+                          offset: const Offset(-8, 0),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: child,
-              ),
+                    child: child,
+                  ),
+                );
+              },
+              child: RepaintBoundary(child: child),
             ),
           ],
         ),
