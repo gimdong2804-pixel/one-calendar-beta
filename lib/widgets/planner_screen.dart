@@ -436,41 +436,47 @@ class _ModeToggleButton extends StatelessWidget {
     final primary = Theme.of(context).colorScheme.primary;
     final tertiary = Theme.of(context).colorScheme.tertiary;
     final color = isTodoPanel ? tertiary : primary;
-    final button = GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: context.read<PlannerProvider>().togglePriorityTodoPanel,
-      child: DecoratedBox(
-        decoration: ShapeDecoration(
-          color: color.withValues(alpha: 0.11),
-          shape: StadiumBorder(
-            side: BorderSide(color: color.withValues(alpha: 0.22)),
+    final button = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          context.read<PlannerProvider>().togglePriorityTodoPanel();
+        },
+        borderRadius: BorderRadius.circular(999),
+        child: DecoratedBox(
+          decoration: ShapeDecoration(
+            color: color.withValues(alpha: 0.11),
+            shape: StadiumBorder(
+              side: BorderSide(color: color.withValues(alpha: 0.22)),
+            ),
           ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: fullWidth ? 18 : 16,
-            vertical: fullWidth ? 17 : 13,
-          ),
-          child: Row(
-            mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                isTodoPanel ? '핵심 목표로 돌아가기' : '할 일 목록 열기',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.w800,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: fullWidth ? 18 : 16,
+              vertical: fullWidth ? 17 : 13,
+            ),
+            child: Row(
+              mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  isTodoPanel ? '핵심 목표로 돌아가기' : '할 일 목록 열기',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Icon(
-                isTodoPanel
-                    ? Icons.keyboard_return_rounded
-                    : Icons.open_in_new_rounded,
-                color: color,
-                size: 18,
-              ),
-            ],
+                const SizedBox(width: 8),
+                Icon(
+                  isTodoPanel
+                      ? Icons.keyboard_return_rounded
+                      : Icons.open_in_new_rounded,
+                  color: color,
+                  size: 18,
+                ),
+              ],
+            ),
           ),
         ),
       ),
