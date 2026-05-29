@@ -8,10 +8,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const int fallbackCurrentBuildNumber = 60;
-const String currentVersionName = 'One UI 1.0 (Beta 60)';
-const String currentReleaseDateIso = '2026-05-29T21:09:00+09:00';
-const String currentReleaseChangelog = '- 설정 화면과 메인 화면을 오갈 때 버벅이던 문제 수정';
+const int fallbackCurrentBuildNumber = 61;
+const String currentVersionName = 'One UI 1.0 (Beta 61)';
+const String currentReleaseDateIso = '2026-05-29T23:13:00+09:00';
+const String currentReleaseChangelog = '- 내부 시스템 안정화 및 성능 개선';
 
 const String _updateInfoUrl =
     'https://raw.githubusercontent.com/gimdong2804-pixel/one-calendar-beta/main/update_info.json';
