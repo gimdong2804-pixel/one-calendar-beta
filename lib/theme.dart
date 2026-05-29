@@ -185,7 +185,7 @@ class OneUIPageTransitionsBuilder extends PageTransitionsBuilder {
     final curve = CurvedAnimation(
       parent: animation,
       curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
     );
 
     // 슬라이드 효과 (오른쪽에서 왼쪽으로)
@@ -194,52 +194,42 @@ class OneUIPageTransitionsBuilder extends PageTransitionsBuilder {
       end: Offset.zero,
     ).animate(curve);
 
-    // 페이드 효과 (부드러운 페이드)
-    final fadeIn = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(curve);
-
     // 뒤에 깔리는 페이지의 연출
     final secondaryCurve = CurvedAnimation(
       parent: secondaryAnimation,
       curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
     );
 
     // 뒤에 깔리는 페이지는 왼쪽으로 부드럽게 약간 밀림
     final slideOut = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(-0.15, 0.0),
-    ).animate(secondaryCurve);
-
-    // 뒤에 깔리는 페이지는 미세하게 작아짐
-    final scaleOut = Tween<double>(
-      begin: 1.0,
-      end: 0.96,
-    ).animate(secondaryCurve);
-
-    // 뒤에 깔리는 페이지의 페이드 아웃
-    final fadeOut = Tween<double>(
-      begin: 1.0,
-      end: 0.0,
+      end: const Offset(-0.25, 0.0),
     ).animate(secondaryCurve);
 
     return RepaintBoundary(
       child: SlideTransition(
         position: slideOut,
-        child: ScaleTransition(
-          scale: scaleOut,
-          child: FadeTransition(
-            opacity: fadeOut,
-            child: SlideTransition(
+        child: Stack(
+          children: [
+            // 페이지 사이의 그림자 (입체감 부여)
+            SlideTransition(
               position: slideIn,
-              child: FadeTransition(
-                opacity: fadeIn,
-                child: RepaintBoundary(child: child),
+              child: Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.15),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                      offset: const Offset(-10, 0),
+                    ),
+                  ],
+                ),
+                child: child,
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
