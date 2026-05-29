@@ -1508,36 +1508,34 @@ class _ActionBar extends StatelessWidget {
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1120),
-          child: RepaintBoundary(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.surface.withValues(alpha: 0.86),
-                borderRadius: BorderRadius.circular(100),
-                border: Border.all(color: context.borderSubtle),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.15),
-                    blurRadius: 36,
-                    offset: const Offset(0, 18),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Theme.of(
+                context,
+              ).colorScheme.surface.withValues(alpha: 0.86),
+              borderRadius: BorderRadius.circular(100),
+              border: Border.all(color: context.borderSubtle),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.15),
+                  blurRadius: 36,
+                  offset: const Offset(0, 18),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: settings.actionBarBlur / 3.0,
+                  sigmaY: settings.actionBarBlur / 3.0,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 14,
                   ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: settings.actionBarBlur / 3.0,
-                    sigmaY: settings.actionBarBlur / 3.0,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 14,
-                    ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: buttons),
-                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: buttons),
                 ),
               ),
             ),
