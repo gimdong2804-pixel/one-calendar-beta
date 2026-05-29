@@ -437,7 +437,9 @@ class _ModeToggleButton extends StatelessWidget {
     final tertiary = Theme.of(context).colorScheme.tertiary;
     final color = isTodoPanel ? tertiary : primary;
     final button = Material(
+      key: ValueKey('mode-toggle-${isTodoPanel ? 'todo' : 'priority'}'),
       color: Colors.transparent,
+      type: MaterialType.transparency,
       child: InkWell(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
@@ -1528,13 +1530,12 @@ class _ActionBar extends StatelessWidget {
                   sigmaX: settings.actionBarBlur / 3.0,
                   sigmaY: settings.actionBarBlur / 3.0,
                 ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
+                child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 14,
                   ),
-                  child: Row(children: buttons),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: buttons),
                 ),
               ),
             ),

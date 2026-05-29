@@ -1,7 +1,7 @@
 {
-  "latestBuildNumber": 55,
-  "versionName": "One UI 1.0 (Beta 55)",
-  "releasedAt": "2026-05-28T22:30:00+09:00",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2055)/app-release.apk",
-  "changelog": "- 할 일 목록 버튼이 가끔 작동되지 않던 문제 수정"
+  "latestBuildNumber": 56,
+  "versionName": "One UI 1.0 (Beta 56)",
+  "releasedAt": "2026-05-28T23:05:00+09:00",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2056)/app-release.apk",
+  "changelog": "- 버그 수정"
 }
