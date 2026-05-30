@@ -1503,45 +1503,64 @@ class _ActionBar extends StatelessWidget {
         })
         .toList();
 
-    return SafeArea(
-      top: false,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1120),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.surface.withValues(alpha: 0.86),
-              borderRadius: BorderRadius.circular(100),
-              border: Border.all(color: context.borderSubtle),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 36,
-                  offset: const Offset(0, 18),
+    final route = ModalRoute.of(context);
+    final routeAnimation = route?.animation;
+    final secondaryRouteAnimation = route?.secondaryAnimation;
+
+    return AnimatedBuilder(
+      animation: Listenable.merge([
+        if (routeAnimation != null) routeAnimation,
+        if (secondaryRouteAnimation != null) secondaryRouteAnimation,
+      ]),
+      builder: (context, child) {
+        final isTransitioning = (routeAnimation?.isAnimating ?? false) ||
+                                (secondaryRouteAnimation?.isAnimating ?? false);
+
+        final innerPadding = Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 14,
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: buttons),
+        );
+
+        return SafeArea(
+          top: false,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1120),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surface.withValues(alpha: 0.86),
+                  borderRadius: BorderRadius.circular(100),
+                  border: Border.all(color: context.borderSubtle),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.15),
+                      blurRadius: 36,
+                      offset: const Offset(0, 18),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: settings.actionBarBlur / 3.0,
-                  sigmaY: settings.actionBarBlur / 3.0,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 14,
-                  ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: buttons),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: isTransitioning
+                      ? innerPadding
+                      : BackdropFilter(
+                          filter: ImageFilter.blur(
+                            sigmaX: settings.actionBarBlur / 3.0,
+                            sigmaY: settings.actionBarBlur / 3.0,
+                          ),
+                          child: innerPadding,
+                        ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -1899,10 +1918,31 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
         ? Colors.black.withValues(alpha: 0.4)
         : Colors.black.withValues(alpha: 0.05);
 
+    final route = ModalRoute.of(context);
+    final routeAnimation = route?.animation;
+    final secondaryRouteAnimation = route?.secondaryAnimation;
+
     final buttonBody = AnimatedBuilder(
-      animation: _bounceController,
+      animation: Listenable.merge([
+        _bounceController,
+        if (routeAnimation != null) routeAnimation,
+        if (secondaryRouteAnimation != null) secondaryRouteAnimation,
+      ]),
       builder: (context, child) {
         final scale = _bounceAnim.value;
+        final isTransitioning = (routeAnimation?.isAnimating ?? false) ||
+                                (secondaryRouteAnimation?.isAnimating ?? false);
+
+        final innerBody = Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: bgColor,
+            shape: BoxShape.circle,
+            border: Border.all(color: borderColor, width: 1.5),
+          ),
+          child: Center(child: widget.glyph),
+        );
 
         return Transform.scale(
           scale: scale,
@@ -1921,21 +1961,14 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
                     ),
                   ],
                 ),
-                child: ClipOval(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                    child: Container(
-                      width: size,
-                      height: size,
-                      decoration: BoxDecoration(
-                        color: bgColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: borderColor, width: 1.5),
+                child: isTransitioning
+                    ? innerBody
+                    : ClipOval(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                          child: innerBody,
+                        ),
                       ),
-                      child: Center(child: widget.glyph),
-                    ),
-                  ),
-                ),
               ),
             ),
           ),

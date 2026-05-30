@@ -1,7 +1,7 @@
 {
-  "latestBuildNumber": 63,
-  "versionName": "One UI 1.0 (Beta 63)",
-  "releasedAt": "2026-05-30T11:34:00+09:00",
-  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2063)/app-release.apk",
-  "changelog": "- 버벅이는 문제 수정"
+  "latestBuildNumber": 65,
+  "versionName": "One UI 1.0 (Beta 65)",
+  "releasedAt": "2026-05-30T11:52:00+09:00",
+  "downloadUrl": "https://github.com/gimdong2804-pixel/one-calendar-beta/raw/main/beta/One%20UI%201.0%20(Beta%2065)/app-release.apk",
+  "changelog": "- 화면 이동 시 버벅이는 문제 수정"
 }
