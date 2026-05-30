@@ -27,7 +27,7 @@ class PlannerData {
         TimeBlock(id: createPlannerId('time'), time: '13:00 - 17:00', text: ''),
         TimeBlock(id: createPlannerId('time'), time: '18:00 - 22:00', text: ''),
       ],
-      todos: const [],
+      todos: <TodoEntry>[],
       pomodoros: List.generate(
         6,
         (index) => PomodoroTask(
