@@ -1840,27 +1840,13 @@ class _FloatingIconButton extends StatefulWidget {
 }
 
 class _FloatingIconButtonState extends State<_FloatingIconButton>
-    with TickerProviderStateMixin {
-  late final AnimationController _breatheController;
-  late final Animation<double> _breatheAnim;
+    with SingleTickerProviderStateMixin {
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnim;
-  Timer? _breatheDelayTimer;
 
   @override
   void initState() {
     super.initState();
-    // Breathing animation: 3s infinite, scale 1.0 <-> 1.03
-    _breatheController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 3000),
-    );
-    _breatheAnim = Tween<double>(begin: 1.0, end: 1.03).animate(
-      CurvedAnimation(
-        parent: _breatheController,
-        curve: const _ClampedCurve(Curves.easeInOut),
-      ),
-    );
 
     // Bounce animation on tap: scale 1 -> 0.85 -> 1.15 -> 0.95 -> 1
     _bounceController = AnimationController(
@@ -1879,17 +1865,10 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
             curve: const _ClampedCurve(Curves.easeInOut),
           ),
         );
-
-    // Start with delay for staggered effect
-    _breatheDelayTimer = Timer(widget.breatheDelay, () {
-      if (mounted) _breatheController.repeat(reverse: true);
-    });
   }
 
   @override
   void dispose() {
-    _breatheDelayTimer?.cancel();
-    _breatheController.dispose();
     _bounceController.dispose();
     super.dispose();
   }
@@ -1921,14 +1900,9 @@ class _FloatingIconButtonState extends State<_FloatingIconButton>
         : Colors.black.withValues(alpha: 0.05);
 
     final buttonBody = AnimatedBuilder(
-      animation: Listenable.merge([_breatheController, _bounceController]),
+      animation: _bounceController,
       builder: (context, child) {
-        final breatheScale = _breatheAnim.value;
-        final bounceScale = _bounceAnim.value;
-
-        final scale = _bounceController.isAnimating
-            ? bounceScale
-            : breatheScale;
+        final scale = _bounceAnim.value;
 
         return Transform.scale(
           scale: scale,
